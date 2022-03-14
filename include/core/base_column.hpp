@@ -123,11 +123,11 @@ class ColumnBase{
 	/***************** persistency operations *****************/		
 	/*! \brief store a column on the disc
 	 *  \return true for sucess and false in case an error occured*/	
-	virtual bool store(const std::string& path) = 0;
+	virtual void store(const std::string& path) = 0;
 	/*! \brief load column from disc
 	 *  \details calling load on a column that is not empty yields undefined behaviour
 	 *  \return true for sucess and false in case an error occured*/		
-	virtual bool load(const std::string& path) = 0;
+	virtual void load(const std::string& path) = 0;
 	/*! \brief use this method to determine whether the column is materialized or a Lookup Column
 	 * \return true in case the column is storing the plain values (without compression) and false in case the column is a LookupColumn.*/		
 	/***************** misc operations *****************/	

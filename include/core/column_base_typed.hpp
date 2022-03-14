@@ -80,8 +80,8 @@ class ColumnBaseTyped : public ColumnBase{
 	//template <typename U, typename BinaryOperator>
 	//std::pair<ColumnPtr,ColumnPtr> aggregate_by_keys(ColumnBaseTyped<U>* keys, BinaryOperator binary_op) const;
 
-	virtual bool store(const std::string& path) = 0;
-	virtual bool load(const std::string& path) = 0;
+	virtual void store(const std::string& path) = 0;
+	virtual void load(const std::string& path) = 0;
 	virtual bool isMaterialized() const  throw() = 0;
 	virtual bool isCompressed() const  throw() = 0;	
 	/*! \brief returns type information of internal values*/

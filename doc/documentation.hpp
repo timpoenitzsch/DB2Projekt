@@ -1,5 +1,5 @@
 /***********************************************************************************************************
-Copyright (c) 2013, Sebastian Breﬂ, Otto-von-Guericke University of Magdeburg, Germany. All rights reserved.
+Copyright (c) 2013, Sebastian Bre√ü, Otto-von-Guericke University of Magdeburg, Germany. All rights reserved.
 
 This program and accompanying materials are made available under the terms of the 
 GNU GENERAL PUBLIC LICENSE - Version 3, http://www.gnu.org/licenses/gpl-3.0.txt

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <core/column_base_typed.hpp>
+#include <cereal/archives/portable_binary.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/string.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -35,10 +38,16 @@ class Column : public ColumnBaseTyped<T>{
 
 	virtual const ColumnPtr copy() const;
 
-	virtual bool store(const std::string& path);
-	virtual bool load(const std::string& path);
+	virtual void store(const std::string& path);
+	virtual void load(const std::string& path);
 	virtual bool isMaterialized() const  throw();
-	virtual bool isCompressed() const  throw();	
+	virtual bool isCompressed() const  throw();
+
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+        archive( values_ ); // serialize things by passing them to the archive
+    }
 	
 	virtual T& operator[](const int index);
 
@@ -59,7 +68,6 @@ class Column : public ColumnBaseTyped<T>{
 
 /***************** Start of Implementation Section ******************/
 
-	
 	template<class T>
 	Column<T>::Column(const std::string& name, AttributeType db_type) : ColumnBaseTyped<T>(name,db_type), type_tid_comparator(), values_(){
 
@@ -230,23 +238,7 @@ class Column : public ColumnBaseTyped<T>{
 //		return std::vector<TID_Pair>();
 //	}
 	template<class T>
-	bool Column<T>::store(const std::string& path_){
-		//string path("data/");
-		std::string path(path_);
-		path += "/";
-		path += this->name_;
-		//std::cout << "Writing Column " << this->getName() << " to File " << path << std::endl;
-		std::ofstream outfile (path.c_str(),std::ios_base::binary | std::ios_base::out);
-		boost::archive::binary_oarchive oa(outfile);
-
-		oa << values_;
-
-		outfile.flush();
-		outfile.close();
-		return true;
-	}
-	template<class T>
-	bool Column<T>::load(const std::string& path_){
+    void Column<T>::load(const std::string& path_){
 		std::string path(path_);
 		//std::cout << "Loading column '" << this->name_ << "' from path '" << path << "'..." << std::endl;
 		//string path("data/");
@@ -255,13 +247,24 @@ class Column : public ColumnBaseTyped<T>{
 		
 		//std::cout << "Opening File '" << path << "'..." << std::endl;
 		std::ifstream infile (path.c_str(),std::ios_base::binary | std::ios_base::in);
-		boost::archive::binary_iarchive ia(infile);
-		ia >> values_;
-		infile.close();
-
-
-		return true;
+		cereal::PortableBinaryInputArchive ia(infile);
+		ia(*this);
 	}
+
+    template<class T>
+    void Column<T>::store(const std::string& path_){
+        std::string path(path_);
+        //std::cout << "Loading column '" << this->name_ << "' from path '" << path << "'..." << std::endl;
+        //string path("data/");
+        path += "/";
+        path += this->name_;
+
+        //std::cout << "Opening File '" << path << "'..." << std::endl;
+        std::ofstream outfile (path.c_str(),std::ios_base::binary | std::ios_base::out);
+        cereal::PortableBinaryOutputArchive oarchive(outfile); // Create an output archive
+        oarchive(*this);
+    }
+
 	template<class T>
 	bool Column<T>::isMaterialized() const  throw(){
 		return true;
