@@ -20,33 +20,33 @@ class DictionaryCompressedColumn : public CompressedColumn<T>{
 	DictionaryCompressedColumn(const std::string& name, AttributeType db_type);
 	virtual ~DictionaryCompressedColumn();
 
-	virtual bool insert(const boost::any& new_Value);
+	virtual bool insert(const std::any& new_Value);
 	virtual bool insert(const T& new_value);
 	template <typename InputIterator>
 	bool insert(InputIterator first, InputIterator last);
 
-	virtual bool update(TID tid, const boost::any& new_value);
-	virtual bool update(PositionListPtr tid, const boost::any& new_value);	
+	virtual bool update(TID tid, const std::any& new_value);
+	virtual bool update(PositionListPtr tid, const std::any& new_value);
 	
 	virtual bool remove(TID tid);
 	//assumes tid list is sorted ascending
 	virtual bool remove(PositionListPtr tid);
 	virtual bool clearContent();
 
-	virtual const boost::any get(TID tid);
-	//virtual const boost::any* const getRawData()=0;
-	virtual void print() const throw();
-	virtual size_t size() const throw();
-	virtual unsigned int getSizeinBytes() const throw();
+	virtual std::any get(TID tid);
+	//virtual const std::any* const getRawData()=0;
+	virtual void print() const noexcept;
+	[[nodiscard]] virtual size_t size() const noexcept;
+	[[nodiscard]] virtual unsigned int getSizeinBytes() const noexcept;
 
-	virtual const ColumnPtr copy() const;
+	[[nodiscard]] virtual ColumnPtr copy() const;
 
 	virtual bool store(const std::string& path);
 	virtual bool load(const std::string& path);
 
 
 	
-	virtual T& operator[](const int index);
+	virtual T& operator[](int index);
 
 };
 
@@ -60,12 +60,10 @@ class DictionaryCompressedColumn : public CompressedColumn<T>{
 	}
 
 	template<class T>
-	DictionaryCompressedColumn<T>::~DictionaryCompressedColumn(){
-
-	}
+	DictionaryCompressedColumn<T>::~DictionaryCompressedColumn()= default;
 
 	template<class T>
-	bool DictionaryCompressedColumn<T>::insert(const boost::any&){
+	bool DictionaryCompressedColumn<T>::insert(const std::any&){
 
 		return false;
 	}
@@ -83,33 +81,33 @@ class DictionaryCompressedColumn : public CompressedColumn<T>{
 	}
 
 	template<class T>
-	const boost::any DictionaryCompressedColumn<T>::get(TID){
+	std::any DictionaryCompressedColumn<T>::get(TID ){
 
-		return boost::any();
+		return {};
 	}
 
 	template<class T>
-	void DictionaryCompressedColumn<T>::print() const throw(){
+	void DictionaryCompressedColumn<T>::print() const noexcept{
 
 	}
 	template<class T>
-	size_t DictionaryCompressedColumn<T>::size() const throw(){
+	size_t DictionaryCompressedColumn<T>::size() const noexcept{
 
 		return 0;
 	}
 	template<class T>
-	const ColumnPtr DictionaryCompressedColumn<T>::copy() const{
+	ColumnPtr DictionaryCompressedColumn<T>::copy() const{
 
-		return ColumnPtr();
+		return {};
 	}
 
 	template<class T>
-	bool DictionaryCompressedColumn<T>::update(TID , const boost::any& ){
+	bool DictionaryCompressedColumn<T>::update(TID , const std::any& ){
 		return false;
 	}
 
 	template<class T>
-	bool DictionaryCompressedColumn<T>::update(PositionListPtr , const boost::any& ){
+	bool DictionaryCompressedColumn<T>::update(PositionListPtr , const std::any& ){
 		return false;		
 	}
 	
@@ -144,7 +142,7 @@ class DictionaryCompressedColumn : public CompressedColumn<T>{
 	}
 
 	template<class T>
-	unsigned int DictionaryCompressedColumn<T>::getSizeinBytes() const throw(){
+	unsigned int DictionaryCompressedColumn<T>::getSizeinBytes() const noexcept{
 		return 0; //return values_.capacity()*sizeof(T);
 	}
 

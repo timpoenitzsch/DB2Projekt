@@ -36,15 +36,15 @@ int main(){
 //	/****** BULK UPDATE TEST ******/
 //	{
 //		std::cout << "BULK UPDATE TEST..."; // << std::endl;
-//		boost::shared_ptr<Column<int> > uncompressed_col (new Column<int>("int column",INT));
-//		boost::shared_ptr<Column<int> > compressed_col (new Column<int>("int column",INT));
-//		//boost::shared_ptr<DictionaryCompressedColumn<int> > compressed_col (new DictionaryCompressedColumn<int>("compressed int column",INT));
+//		std::shared_ptr<Column<int> > uncompressed_col (new Column<int>("int column",INT));
+//		std::shared_ptr<Column<int> > compressed_col (new Column<int>("int column",INT));
+//		//std::shared_ptr<DictionaryCompressedColumn<int> > compressed_col (new DictionaryCompressedColumn<int>("compressed int column",INT));
 
 
 //		uncompressed_col->insert(reference_data.begin(),reference_data.end()); 
 //		compressed_col->insert(reference_data.begin(),reference_data.end()); 
 
-//		bool result = *(boost::static_pointer_cast<ColumnBaseTyped<int> >(uncompressed_col))==*(boost::static_pointer_cast<ColumnBaseTyped<int> >(compressed_col));
+//		bool result = *(std::static_pointer_cast<ColumnBaseTyped<int> >(uncompressed_col))==*(std::static_pointer_cast<ColumnBaseTyped<int> >(compressed_col));
 //		if(!result){ 
 //			std::cerr << std::endl << "operator== TEST FAILED!" << std::endl;	
 //			return false;
@@ -58,7 +58,7 @@ int main(){
 //		uncompressed_col->update(tids,new_value); 
 //		compressed_col->update(tids,new_value); 
 
-//		result = *(boost::static_pointer_cast<ColumnBaseTyped<int> >(uncompressed_col))==*(boost::static_pointer_cast<ColumnBaseTyped<int> >(compressed_col));
+//		result = *(std::static_pointer_cast<ColumnBaseTyped<int> >(uncompressed_col))==*(std::static_pointer_cast<ColumnBaseTyped<int> >(compressed_col));
 //		if(!result){
 //			 std::cerr << std::endl << "BULK UPDATE TEST FAILED!" << std::endl;	
 //			 return false;	
@@ -70,15 +70,15 @@ int main(){
 //	/****** BULK DELETE TEST ******/
 //	{
 //		std::cout << "BULK DELETE TEST..."; // << std::endl;
-//		boost::shared_ptr<Column<int> > uncompressed_col (new Column<int>("int column",INT));
-//		boost::shared_ptr<Column<int> > compressed_col (new Column<int>("int column",INT));
+//		std::shared_ptr<Column<int> > uncompressed_col (new Column<int>("int column",INT));
+//		std::shared_ptr<Column<int> > compressed_col (new Column<int>("int column",INT));
 
-//		//boost::shared_ptr<DictionaryCompressedColumn<int> > compressed_col (new DictionaryCompressedColumn<int>("compressed int column",INT));
+//		//std::shared_ptr<DictionaryCompressedColumn<int> > compressed_col (new DictionaryCompressedColumn<int>("compressed int column",INT));
 
 //		uncompressed_col->insert(reference_data.begin(),reference_data.end()); 
 //		compressed_col->insert(reference_data.begin(),reference_data.end()); 
 
-//		bool result = *(boost::static_pointer_cast<ColumnBaseTyped<int> >(uncompressed_col))==*(boost::static_pointer_cast<ColumnBaseTyped<int> >(compressed_col));
+//		bool result = *(std::static_pointer_cast<ColumnBaseTyped<int> >(uncompressed_col))==*(std::static_pointer_cast<ColumnBaseTyped<int> >(compressed_col));
 //		if(!result){ 
 //			std::cerr << std::endl << "operator== TEST FAILED!" << std::endl;	
 //			return false;
@@ -93,7 +93,7 @@ int main(){
 //		uncompressed_col->remove(tids); 
 //		compressed_col->remove(tids); 
 
-//		result = *(boost::static_pointer_cast<ColumnBaseTyped<int> >(uncompressed_col))==*(boost::static_pointer_cast<ColumnBaseTyped<int> >(compressed_col));
+//		result = *(std::static_pointer_cast<ColumnBaseTyped<int> >(uncompressed_col))==*(std::static_pointer_cast<ColumnBaseTyped<int> >(compressed_col));
 //		if(!result){
 //			 std::cerr << "BULK DELETE TEST FAILED!" << std::endl;	
 //			 return false;	

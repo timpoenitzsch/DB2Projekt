@@ -2,26 +2,26 @@
 #include <core/base_column.hpp>
 #include <core/column.hpp>
 #include <iostream>
+#include <utility>
 
-using namespace std;
 
 namespace CoGaDB{
 
-	ColumnBase::ColumnBase(const std::string& name, AttributeType db_type) : name_(name), db_type_(db_type){
+	ColumnBase::ColumnBase(std::string name, AttributeType db_type) : name_(std::move(name)), db_type_(db_type){
 
 	}
 
-	ColumnBase::~ColumnBase(){}
+	ColumnBase::~ColumnBase()= default;
 
-	AttributeType ColumnBase::getType() const throw(){
+	AttributeType ColumnBase::getType() const noexcept{
 		return db_type_;
 	}
 
-	const string ColumnBase::getName() const throw(){
+	std::string ColumnBase::getName() const noexcept{
 		return name_;
 	}
 
-	const ColumnPtr createColumn(AttributeType type, const std::string& name){
+	ColumnPtr createColumn(AttributeType type, const std::string& name){
 
 	ColumnPtr ptr;
 	if(type==INT){
@@ -29,13 +29,13 @@ namespace CoGaDB{
 	}else if(type==FLOAT){
 		ptr=ColumnPtr(new Column<float>(name,FLOAT));
 	}else if(type==VARCHAR){
-		ptr=ColumnPtr(new Column<string>(name,VARCHAR));
+		ptr=ColumnPtr(new Column<std::string>(name,VARCHAR));
 	}else if(type==BOOLEAN){
 		//ptr=ColumnPtr(new Column<bool>(name,BOOLEAN));
-		cout << "Fatal Error! invalid AttributeType: " << type << " for Column: " << name 
-			  << " Note: bool is currently not supported, will be added again in the future!"<< endl;
+        std::cerr << "Fatal Error! invalid AttributeType: " << type << " for Column: " << name
+			  << " Note: bool is currently not supported, will be added again in the future!"<< std::endl;
 	}else{
-		cout << "Fatal Error! invalid AttributeType: " << type << " for Column: " << name << endl;
+		std::cerr << "Fatal Error! invalid AttributeType: " << type << " for Column: " << name << std::endl;
 	}
 
 	return ptr;

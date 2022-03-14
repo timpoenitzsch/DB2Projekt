@@ -1,69 +1,51 @@
-
 #pragma once
 
-#include <vector>
+#include <any>
 #include <list>
 #include <map>
 #include <string>
-#include <boost/any.hpp>
+#include <vector>
 
-#include <boost/shared_ptr.hpp>
+namespace CoGaDB
+{
 
-namespace shared_pointer_namespace = boost; //std::tr1
+    enum AttributeType
+    {
+        INT,
+        FLOAT,
+        VARCHAR,
+        BOOLEAN
+    };
 
-namespace CoGaDB{
+    enum ValueComparator
+    {
+        LESSER,
+        GREATER,
+        EQUAL
+    };
 
-enum AttributeType{INT,FLOAT,VARCHAR,BOOLEAN};
+    enum SortOrder
+    {
+        ASCENDING,
+        DESCENDING
+    };
 
-enum ComputeDevice{CPU,GPU};
+    enum DebugMode
+    {
+        quiet = 1,
+        verbose = 0,
+        debug = 0,
+        print_time_measurement = 0
+    };
 
-enum AggregationMethod{SUM,MIN,MAX};
+    using TID = unsigned int;
 
-enum ValueComparator{LESSER,GREATER,EQUAL};
+    using TID_Pair = std::pair<TID, TID>;
 
-enum SortOrder{ASCENDING,DESCENDING};
+    using Attribut = std::pair<AttributeType, std::string>;
 
-enum Operation{SELECTION,PROJECTION,JOIN,GROUPBY,SORT,COPY,AGGREGATION,FULL_SCAN,INDEX_SCAN};
+    using TableSchema = std::list<Attribut>;
 
-enum JoinAlgorithm{SORT_MERGE_JOIN,NESTED_LOOP_JOIN,HASH_JOIN};
+    using Tuple = std::vector<std::any>;
 
-enum MaterializationStatus{MATERIALIZE,LOOKUP};
-
-enum ParallelizationMode{SERIAL,PARALLEL};
-
-
-
-enum DebugMode{quiet=1,
-					verbose=0,
-					debug=0,
-					print_time_measurement=0};
-
-
-//enum DebugMode{quiet=0,
-//					verbose=1,
-//					debug=1};
-
-typedef unsigned int TID;
-
-typedef std::pair<TID,TID> TID_Pair;
-
-typedef std::pair<AttributeType,std::string> Attribut;
-
-typedef std::list<Attribut> TableSchema;
-
-typedef std::vector<boost::any> Tuple;
-
-//struct Attribut {
-
-//	AttributeType type_;
-//	std::string name_;
-//	ColumnPtr column_;
-
-//	AttributeType& first;
-//	std::string& second;
-
-//}
-
-
-}; //end namespace CogaDB
-
+}; // namespace CoGaDB
