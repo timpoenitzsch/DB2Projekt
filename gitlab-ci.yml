@@ -1,0 +1,21 @@
+stages:
+  - build
+  - test
+
+default:
+  image: ubuntu:latest
+  script:
+    - apt-get update && apt-get install -y gcc g++ make
+
+build:
+  stage: build
+  script:
+    - mkdir build
+    - cmake -H. -Bbuild
+    - cd build && cmake --build .
+
+#test:
+#  stage: test
+#  script:
+#    - cd build && cmake --build .
+#    -
