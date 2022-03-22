@@ -8,7 +8,7 @@ default:
 build:
   stage: build
   script:
-    - apt-get update && apt-get install -y gcc g++ make
+    - apt-get update && apt-get install -y gcc g++ make cmake
     - mkdir build
     - cmake -H. -Bbuild
     - cd build && cmake --build .
