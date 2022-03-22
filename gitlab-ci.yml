@@ -4,12 +4,11 @@ stages:
 
 default:
   image: ubuntu:latest
-  script:
-    - apt-get update && apt-get install -y gcc g++ make
 
 build:
   stage: build
   script:
+    - apt-get update && apt-get install -y gcc g++ make
     - mkdir build
     - cmake -H. -Bbuild
     - cd build && cmake --build .
