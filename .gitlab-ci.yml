@@ -8,7 +8,7 @@ default:
 build:
   stage: build
   script:
-    - apt-get update && apt-get install -y gcc g++ make cmake git
+    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y gcc g++ make cmake git
     - mkdir build
     - cmake -H. -Bbuild
     - cd build && cmake --build .
