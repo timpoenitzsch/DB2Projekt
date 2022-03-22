@@ -64,7 +64,6 @@ void fill_column(ColumnBaseTyped<T> &col, std::vector<T> &reference_data)
     {
         col.insert(reference_data[i]);
     }
-    std::cout << "Size in Bytes: " << col.getSizeinBytes() << std::endl;
 }
 template<class Column>
 class ColumnComparator : public Catch::MatcherBase<Column> {

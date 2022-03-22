@@ -94,7 +94,7 @@ namespace CoGaDB
          * \return a reference to the value at position index
          * */
         virtual T &operator[](int index) = 0;
-        inline bool operator==(ColumnBaseTyped<T> &column);
+        inline bool operator==(const ColumnBaseTyped<T> &column) const;
     };
 
     template<class T>
@@ -313,13 +313,13 @@ namespace CoGaDB
     }
 
     template<class T>
-    bool ColumnBaseTyped<T>::operator==(ColumnBaseTyped<T> &column)
+    bool ColumnBaseTyped<T>::operator==(const ColumnBaseTyped<T> &column) const
     {
         if (this->size() != column.size())
             return false;
         for (unsigned int i = 0; i < this->size(); i++)
         {
-            if ((*this)[i] != column[i])
+            if (const_cast<ColumnBaseTyped<T> &>(*this)[i] != const_cast<ColumnBaseTyped<T> &>(column)[i])
             {
                 return false;
             }
