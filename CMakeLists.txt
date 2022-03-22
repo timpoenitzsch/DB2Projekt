@@ -1,8 +1,7 @@
-project(db2_programming_project LANGUAGES CXX)
 cmake_minimum_required(VERSION 3.13)
+cmake_policy(SET CMP0048 NEW)
+project(db2_programming_project VERSION 2.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard to conform to")
-set(PROJECT_VERSION 2.0)
 #download and include cmake package manager
 set(CPM_DOWNLOAD_VERSION 0.34.0)
 
@@ -28,12 +27,6 @@ include(${CPM_DOWNLOAD_LOCATION})
 
 #unittests
 CPMAddPackage("gh:catchorg/Catch2@2.13.8")
-CPMAddPackage(
-        NAME cereal
-        VERSION 1.3.0
-        GITHUB_REPOSITORY USCiLab/cereal
-        OPTIONS "SKIP_PORTABILITY_TEST ON" "JUST_INSTALL_CEREAL ON"
-)
 
 #serialization
 CPMAddPackage(
@@ -69,6 +62,8 @@ endif()
 
 include_directories(include)
 
+configure_file(include/config.hpp.in include/config.hpp)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 #add source
 add_subdirectory(src)
 

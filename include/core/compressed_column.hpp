@@ -33,21 +33,23 @@ namespace CoGaDB
         virtual bool remove(PositionListPtr tid) = 0;
         virtual bool clearContent() = 0;
 
-        virtual const std::any get(TID tid) = 0;
+        virtual std::any get(TID tid) = 0;
         // virtual const std::any* const getRawData()=0;
         virtual void print() const noexcept = 0;
         [[nodiscard]] virtual size_t size() const noexcept = 0;
         [[nodiscard]] virtual unsigned int getSizeinBytes() const noexcept = 0;
 
-        [[nodiscard]] virtual const ColumnPtr copy() const = 0;
+        [[nodiscard]] virtual ColumnPtr copy() const = 0;
 
-        virtual bool store(const std::string &path) = 0;
-        virtual bool load(const std::string &path) = 0;
+        virtual void store(const std::string &path) = 0;
+        virtual void load(const std::string &path) = 0;
         [[nodiscard]] virtual bool isMaterialized() const noexcept;
 
         [[nodiscard]] virtual bool isCompressed() const noexcept;
 
         virtual T &operator[](int index) = 0;
+
+        virtual T &operator[](int index) const = 0;
     };
 
     using CompressedIntegerColumn = CompressedColumn<int>;

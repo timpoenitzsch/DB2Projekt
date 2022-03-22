@@ -33,6 +33,7 @@ namespace CoGaDB
     class ColumnBaseTyped : public ColumnBase
     {
       public:
+        using value_type = T;
         // typedef std::shared_ptr<ColumnBaseTyped> ColumnPtr;
         /***************** constructors and destructor *****************/
         ColumnBaseTyped(const std::string &name, AttributeType db_type);

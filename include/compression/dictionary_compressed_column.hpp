@@ -41,12 +41,13 @@ class DictionaryCompressedColumn : public CompressedColumn<T>{
 
 	[[nodiscard]] virtual ColumnPtr copy() const;
 
-	virtual bool store(const std::string& path);
-	virtual bool load(const std::string& path);
+	virtual void store(const std::string& path);
+	virtual void load(const std::string& path);
 
 
 	
 	virtual T& operator[](int index);
+    virtual T& operator[](int index) const;
 
 };
 
@@ -127,12 +128,10 @@ class DictionaryCompressedColumn : public CompressedColumn<T>{
 	}
 
 	template<class T>
-	bool DictionaryCompressedColumn<T>::store(const std::string&){
-		return false;
+    void DictionaryCompressedColumn<T>::store(const std::string&){
 	}
 	template<class T>
-	bool DictionaryCompressedColumn<T>::load(const std::string&){
-		return false;
+    void DictionaryCompressedColumn<T>::load(const std::string&){
 	}
 
 	template<class T>
@@ -140,6 +139,12 @@ class DictionaryCompressedColumn : public CompressedColumn<T>{
 		static T t;
 		return t;
 	}
+
+    template<class T>
+    T& DictionaryCompressedColumn<T>::operator[](const int) const {
+        static T t;
+        return t;
+    }
 
 	template<class T>
 	unsigned int DictionaryCompressedColumn<T>::getSizeinBytes() const noexcept{
