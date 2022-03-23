@@ -36,12 +36,12 @@ test:
     - cd build && cmake --build .
     - ctest --extra-verbose
 
-macos-build:
-  stage: build
-  tags:
-    - macosx
-  script:
-    - mkdir build
-    - cmake -H. -Bbuild
-    - cd build && cmake --build .
-    - ctest --extra-verbose
+#macos-build:
+#  stage: build
+#  tags:
+#    - macosx
+#  script:
+#    - mkdir build
+#    - cmake -H. -Bbuild
+#    - cd build && cmake --build .
+#    - ctest --extra-verbose
