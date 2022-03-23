@@ -2,28 +2,44 @@ stages:
   - build
   - test
 
-default:
-  image: ubuntu:latest
-
-before_script:
-    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y gcc g++ clang make cmake git
-
 build-gcc:
+  image: ubuntu:latest
+  tags:
+    - docker
   stage: build
   script:
+    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y gcc g++ make cmake git
     - mkdir build
-    - cmake -H. -Bbuild -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+    - cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
     - cd build && cmake --build .
 
 build-clang:
+  image: ubuntu:latest
+  tags:
+    - docker
   stage: build
   script:
+    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y clang make cmake git
     - mkdir build
-    - cmake -H. -Bbuild -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+    - cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=clang++
     - cd build && cmake --build .
 
 test:
+  image: ubuntu:latest
+  tags:
+    - docker
   stage: test
+  script:
+    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y gcc g++ make cmake git
+    - mkdir build
+    - cmake -H. -Bbuild
+    - cd build && cmake --build .
+    - ctest --extra-verbose
+
+macos-build:
+  stage: build
+  tags:
+    - macosx
   script:
     - mkdir build
     - cmake -H. -Bbuild
