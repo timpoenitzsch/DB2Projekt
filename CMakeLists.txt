@@ -65,6 +65,10 @@ include_directories(include)
 configure_file(include/config.hpp.in include/config.hpp)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 #add source
+enable_testing()
+include(CTest)
+include(${Catch2_SOURCE_DIR}/contrib/Catch.cmake)
+
 add_subdirectory(src)
 
 #TODO: custom release command with archiving
