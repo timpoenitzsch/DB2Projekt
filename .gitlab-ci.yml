@@ -6,16 +6,26 @@ default:
   image: ubuntu:latest
 
 before_script:
-    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y gcc g++ make cmake git
+    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y gcc g++ clang make cmake git
 
-build:
+build-gcc:
   stage: build
   script:
     - mkdir build
-    - cmake -H. -Bbuild
+    - cmake -H. -Bbuild -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+    - cd build && cmake --build .
+
+build-clang:
+  stage: build
+  script:
+    - mkdir build
+    - cmake -H. -Bbuild -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
     - cd build && cmake --build .
 
 test:
   stage: test
   script:
+    - mkdir build
+    - cmake -H. -Bbuild
+    - cd build && cmake --build .
     - ctest --extra-verbose
