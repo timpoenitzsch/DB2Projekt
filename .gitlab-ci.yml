@@ -1,7 +1,11 @@
+stages:
+  - build
+  - test
+
 default:
   image: ubuntu:latest
 
-.pre:
+setup:
   stage: .pre
   script:
     - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y gcc g++ make cmake git
