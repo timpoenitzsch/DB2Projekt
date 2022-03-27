@@ -143,4 +143,4 @@ namespace CoGaDB
 
     /***************** End of Implementation Section ******************/
 
-}; // namespace CoGaDB
+} // namespace CoGaDB

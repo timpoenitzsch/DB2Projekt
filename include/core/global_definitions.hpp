@@ -44,4 +44,4 @@ namespace CoGaDB
     using TID = unsigned int;
     using Attribut = std::pair<AttributeType, std::string>;
 
-}; // namespace CoGaDB
+} // namespace CoGaDB

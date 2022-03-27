@@ -142,4 +142,4 @@ namespace CoGaDB
     /*! \brief Column factory function, creates an empty materialized column*/
     std::unique_ptr<ColumnBase> createColumn(AttributeType type, const std::string &name);
 
-}; // namespace CoGaDB
+} // namespace CoGaDB

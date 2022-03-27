@@ -48,4 +48,4 @@ namespace CoGaDB
         return ptr;
     }
 
-}; // namespace CoGaDB
+} // namespace CoGaDB

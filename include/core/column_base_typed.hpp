@@ -454,4 +454,4 @@ namespace CoGaDB
         return false;
     }
 
-}; // namespace CoGaDB
+} // namespace CoGaDB
