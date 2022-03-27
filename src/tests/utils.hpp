@@ -58,13 +58,10 @@ void fill_column(ColumnBaseTyped<T> &col, std::vector<T> &reference_data)
     for (unsigned int i = 0; i < reference_data.size(); i++)
     {
         reference_data[i] = get_rand_value<T>();
-    }
-
-    for (unsigned int i = 0; i < reference_data.size(); i++)
-    {
         col.insert(reference_data[i]);
     }
 }
+
 template<class Column>
 class ColumnComparator : public Catch::MatcherBase<Column> {
     std::vector<typename Column::value_type> ref_data;
@@ -102,23 +99,6 @@ class ColumnComparator : public Catch::MatcherBase<Column> {
 template <class Column>
 inline ColumnComparator<Column> isEqual(std::vector<typename Column::value_type> &ref_data) {
     return ColumnComparator<Column>(ref_data);
-}
-
-template<class T>
-bool equals(std::vector<T> reference_data, ColumnBaseTyped<T> &col)
-{
-    for (unsigned int i = 0; i < reference_data.size(); i++)
-    {
-        T col_value = col[i];
-        if (reference_data[i] != col_value)
-        {
-            std::cout << "Fatal Error! In Unittest: read invalid data" << std::endl;
-            std::cout << "Column: '" << col.getName() << "' TID: '" << i << "' Expected Value: '" << reference_data[i]
-                      << "' Actual Value: '" << col_value << "'" << std::endl;
-            return false;
-        }
-    }
-    return true;
 }
 
 template<typename ValueType>

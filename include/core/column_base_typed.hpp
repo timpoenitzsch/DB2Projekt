@@ -39,17 +39,17 @@ namespace CoGaDB
         ColumnBaseTyped(const std::string &name, AttributeType db_type);
         ~ColumnBaseTyped() override;
 
-        bool insert(const std::any &new_Value) override = 0;
+        bool insert(const ColumnType &new_Value) override = 0;
         virtual bool insert(const T &new_Value) = 0;
-        bool update(TID tid, const std::any &new_value) override = 0;
-        bool update(PositionListPtr tid, const std::any &new_value) override = 0;
+        bool update(TID tid, const ColumnType &new_value) override = 0;
+        bool update(PositionListPtr tid, const ColumnType &new_value) override = 0;
 
         bool remove(TID tid) override = 0;
         // assumes tid list is sorted ascending
         bool remove(PositionListPtr tid) override = 0;
         bool clearContent() override = 0;
 
-        std::any get(TID tid) override = 0;
+        ColumnType get(TID tid) override = 0;
         // virtual const std::any* const getRawData()=0;
         void print() const noexcept override = 0;
         [[nodiscard]] size_t size() const noexcept override = 0;
@@ -58,8 +58,8 @@ namespace CoGaDB
         [[nodiscard]] ColumnPtr copy() const override = 0;
         /***************** relational operations on Columns which return lookup tables *****************/
         PositionListPtr sort(SortOrder order) override;
-        PositionListPtr selection(const std::any &value_for_comparison, ValueComparator comp) override;
-        PositionListPtr parallel_selection(const std::any &value_for_comparison,
+        PositionListPtr selection(const ColumnType &value_for_comparison, ValueComparator comp) override;
+        PositionListPtr parallel_selection(const ColumnType &value_for_comparison,
                                            ValueComparator comp,
                                            unsigned int number_of_threads) override;
         // join algorithms
@@ -67,17 +67,17 @@ namespace CoGaDB
         PositionListPairPtr sort_merge_join(ColumnPtr join_column) override;
         PositionListPairPtr nested_loop_join(ColumnPtr join_column) override;
 
-        bool add(const std::any &new_Value) override;
+        bool add(const ColumnType &new_Value) override;
         // vector addition between columns
         bool add(ColumnPtr join_column) override;
 
-        bool minus(const std::any &new_Value) override;
+        bool minus(const ColumnType &new_Value) override;
         bool minus(ColumnPtr join_column) override;
 
-        bool multiply(const std::any &new_Value) override;
+        bool multiply(const ColumnType &new_Value) override;
         bool multiply(ColumnPtr join_column) override;
 
-        bool division(const std::any &new_Value) override;
+        bool division(const ColumnType &new_Value) override;
         bool division(ColumnPtr join_column) override;
 
         // template <typename U, typename BinaryOperator>
@@ -87,8 +87,6 @@ namespace CoGaDB
         void load(const std::string &path) override = 0;
         [[nodiscard]] bool isMaterialized() const noexcept override = 0;
         [[nodiscard]] bool isCompressed() const noexcept override = 0;
-        /*! \brief returns type information of internal values*/
-        [[nodiscard]] const std::type_info &type() const noexcept override;
         /*! \brief defines operator[] for this class, which enables the user to thread all typed columns as arrays.
          * \details Note that this method is pure virtual, so it has to be defined in a derived class.
          * \return a reference to the value at position index
@@ -104,12 +102,6 @@ namespace CoGaDB
 
     template<class T>
     ColumnBaseTyped<T>::~ColumnBaseTyped() = default;
-
-    template<class T>
-    const std::type_info &ColumnBaseTyped<T>::type() const noexcept
-    {
-        return typeid(T);
-    }
 
     template<class T>
     PositionListPtr ColumnBaseTyped<T>::sort(SortOrder order)
@@ -148,7 +140,7 @@ namespace CoGaDB
     }
 
     template<class T>
-    PositionListPtr ColumnBaseTyped<T>::parallel_selection(const std::any &, const ValueComparator, unsigned int)
+    PositionListPtr ColumnBaseTyped<T>::parallel_selection(const ColumnType &, const ValueComparator, unsigned int)
     {
         PositionListPtr result_tids(new PositionList());
 
@@ -156,16 +148,9 @@ namespace CoGaDB
     }
 
     template<class T>
-    PositionListPtr ColumnBaseTyped<T>::selection(const std::any &value_for_comparison, const ValueComparator comp)
+    PositionListPtr ColumnBaseTyped<T>::selection(const ColumnType &value_for_comparison, const ValueComparator comp)
     {
-        if (value_for_comparison.type() != typeid(T))
-        {
-            std::cerr << "Fatal Error!!! Typemismatch for column " << name_ << std::endl;
-            std::cerr << "File: " << __FILE__ << " Line: " << __LINE__ << std::endl;
-            std::abort();
-        }
-
-        T value = std::any_cast<T>(value_for_comparison);
+        T value = std::get<T>(value_for_comparison);
 
         PositionListPtr result_tids;
 
@@ -216,7 +201,7 @@ namespace CoGaDB
     {
         typedef std::unordered_multimap<T, TID, std::hash<T>, std::equal_to<T>> HashTable;
 
-        if (join_column_->type() != typeid(T))
+        if (join_column_->getType() != getType())
         {
             std::cerr << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_->getName()
                       << std::endl;
@@ -258,12 +243,12 @@ namespace CoGaDB
     template<class Type>
     PositionListPairPtr ColumnBaseTyped<Type>::sort_merge_join(ColumnPtr join_column_)
     {
-        if (join_column_->type() != typeid(Type))
+        if (join_column_->getType() != getType())
         {
             std::cout << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_->getName()
                       << std::endl;
             std::cout << "File: " << __FILE__ << " Line: " << __LINE__ << std::endl;
-            exit(-1);
+            abort();
         }
 
         std::shared_ptr<ColumnBaseTyped<Type>> join_column =
@@ -280,7 +265,7 @@ namespace CoGaDB
     PositionListPairPtr ColumnBaseTyped<Type>::nested_loop_join(ColumnPtr join_column_)
     {
         assert(join_column_ != nullptr);
-        if (join_column_->type() != typeid(Type))
+        if (join_column_->getType() != getType())
         {
             std::cout << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_->getName()
                       << std::endl;
@@ -328,22 +313,19 @@ namespace CoGaDB
     }
 
     template<class Type>
-    bool ColumnBaseTyped<Type>::add(const std::any &new_value)
+    bool ColumnBaseTyped<Type>::add(const ColumnType &new_value)
     {
-        if (!new_value.has_value())
+        if (std::holds_alternative<std::monostate>(new_value))
             return false;
-        if (typeid(Type) == new_value.type())
+
+        Type value = std::get<Type>(new_value);
+        // std::transform(myvec.begin(), myvec.end(), myvec.begin(),
+        // bind2nd(std::plus<double>(), 1.0));
+        for (unsigned int i = 0; i < this->size(); i++)
         {
-            Type value = std::any_cast<Type>(new_value);
-            // std::transform(myvec.begin(), myvec.end(), myvec.begin(),
-            // bind2nd(std::plus<double>(), 1.0));
-            for (unsigned int i = 0; i < this->size(); i++)
-            {
-                this->operator[](i) += value;
-            }
-            return true;
+            this->operator[](i) += value;
         }
-        return false;
+        return true;
     }
 
     template<class Type>
@@ -361,22 +343,19 @@ namespace CoGaDB
     }
 
     template<class Type>
-    bool ColumnBaseTyped<Type>::minus(const std::any &new_value)
+    bool ColumnBaseTyped<Type>::minus(const ColumnType &new_value)
     {
         // shared_pointer_namespace::shared_ptr<ColumnBaseTyped<Type> > typed_column =
         // shared_pointer_namespace::static_pointer_cast<ColumnBaseTyped<Type> >(column);
-        if (!new_value.has_value())
+        if (std::holds_alternative<std::monostate>(new_value))
             return false;
-        if (typeid(Type) == new_value.type())
+
+        Type value = std::any_cast<Type>(new_value);
+        for (unsigned int i = 0; i < this->size(); i++)
         {
-            Type value = std::any_cast<Type>(new_value);
-            for (unsigned int i = 0; i < this->size(); i++)
-            {
-                this->operator[](i) -= value;
-            }
-            return true;
+            this->operator[](i) -= value;
         }
-        return false;
+        return true;
     }
 
     template<class Type>
@@ -394,20 +373,17 @@ namespace CoGaDB
     }
 
     template<class Type>
-    bool ColumnBaseTyped<Type>::multiply(const std::any &new_value)
+    bool ColumnBaseTyped<Type>::multiply(const ColumnType &new_value)
     {
-        if (!new_value.has_value())
+        if (std::holds_alternative<std::monostate>(new_value))
             return false;
-        if (typeid(Type) == new_value.type())
+
+        Type value = std::any_cast<Type>(new_value);
+        for (unsigned int i = 0; i < this->size(); i++)
         {
-            Type value = std::any_cast<Type>(new_value);
-            for (unsigned int i = 0; i < this->size(); i++)
-            {
-                this->operator[](i) *= value;
-            }
-            return true;
+            this->operator[](i) *= value;
         }
-        return false;
+        return true;
     }
 
     template<class Type>
@@ -425,23 +401,20 @@ namespace CoGaDB
     }
 
     template<class Type>
-    bool ColumnBaseTyped<Type>::division(const std::any &new_value)
+    bool ColumnBaseTyped<Type>::division(const ColumnType &new_value)
     {
-        if (!new_value.has_value())
+        if (std::holds_alternative<std::monostate>(new_value))
             return false;
-        if (typeid(Type) == new_value.type())
+
+        Type value = std::any_cast<Type>(new_value);
+        // check that we do not devide by zero
+        if (value == 0)
+            return false;
+        for (unsigned int i = 0; i < this->size(); i++)
         {
-            Type value = std::any_cast<Type>(new_value);
-            // check that we do not devide by zero
-            if (value == 0)
-                return false;
-            for (unsigned int i = 0; i < this->size(); i++)
-            {
-                this->operator[](i) /= value;
-            }
-            return true;
+            this->operator[](i) /= value;
         }
-        return false;
+        return true;
     }
 
     template<class Type>
@@ -460,7 +433,7 @@ namespace CoGaDB
 
     // total tempalte specializations, because numeric computations are undefined on strings
     template<>
-    inline bool ColumnBaseTyped<std::string>::add(const std::any &)
+    inline bool ColumnBaseTyped<std::string>::add(const ColumnType &)
     {
         return false;
     }
@@ -471,7 +444,7 @@ namespace CoGaDB
     }
 
     template<>
-    inline bool ColumnBaseTyped<std::string>::minus(const std::any &)
+    inline bool ColumnBaseTyped<std::string>::minus(const ColumnType &)
     {
         return false;
     }
@@ -482,7 +455,7 @@ namespace CoGaDB
     }
 
     template<>
-    inline bool ColumnBaseTyped<std::string>::multiply(const std::any &)
+    inline bool ColumnBaseTyped<std::string>::multiply(const ColumnType &)
     {
         return false;
     }
@@ -493,7 +466,7 @@ namespace CoGaDB
     }
 
     template<>
-    inline bool ColumnBaseTyped<std::string>::division(const std::any &)
+    inline bool ColumnBaseTyped<std::string>::division(const ColumnType &)
     {
         return false;
     }

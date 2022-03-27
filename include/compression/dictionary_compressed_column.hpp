@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <core/compressed_column.hpp>
+#include "core/compressed_column.hpp"
+#include "core/global_definitions.hpp"
 
 namespace CoGaDB{
 	
@@ -33,7 +34,7 @@ class DictionaryCompressedColumn : public CompressedColumn<T>{
 	virtual bool remove(PositionListPtr tid);
 	virtual bool clearContent();
 
-	virtual std::any get(TID tid);
+	virtual ColumnType get(TID tid);
 	//virtual const std::any* const getRawData()=0;
 	virtual void print() const noexcept;
 	[[nodiscard]] virtual size_t size() const noexcept;

@@ -22,19 +22,19 @@ namespace CoGaDB
         CompressedColumn(const std::string &name, AttributeType db_type);
         virtual ~CompressedColumn();
 
-        virtual bool insert(const std::any &new_Value) = 0;
+        virtual bool insert(const ColumnType &new_Value) = 0;
         virtual bool insert(const T &new_value) = 0;
 
-        virtual bool update(TID tid, const std::any &new_value) = 0;
-        virtual bool update(PositionListPtr tid, const std::any &new_value) = 0;
+        virtual bool update(TID tid, const ColumnType &new_value) = 0;
+        virtual bool update(PositionListPtr tid, const ColumnType &new_value) = 0;
 
         virtual bool remove(TID tid) = 0;
         // assumes tid list is sorted ascending
         virtual bool remove(PositionListPtr tid) = 0;
         virtual bool clearContent() = 0;
 
-        virtual std::any get(TID tid) = 0;
-        // virtual const std::any* const getRawData()=0;
+        virtual ColumnType get(TID tid) = 0;
+
         virtual void print() const noexcept = 0;
         [[nodiscard]] virtual size_t size() const noexcept = 0;
         [[nodiscard]] virtual unsigned int getSizeinBytes() const noexcept = 0;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <any>
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
@@ -20,21 +19,20 @@ namespace CoGaDB
         // Column(const Column& column);
         ~Column() override;
 
-        bool insert(const std::any &new_value) override;
+        bool insert(const ColumnType &new_value) override;
         bool insert(const T &new_value) override;
         template<typename InputIterator>
         bool insert(InputIterator first, InputIterator last);
 
-        bool update(TID tid, const std::any &new_value) override;
-        bool update(PositionListPtr tid, const std::any &new_value) override;
+        bool update(TID tid, const ColumnType &new_value) override;
+        bool update(PositionListPtr tid, const ColumnType &new_value) override;
 
         bool remove(TID tid) override;
         // assumes tid list is sorted ascending
         bool remove(PositionListPtr tid) override;
         bool clearContent() override;
 
-        std::any get(TID tid) override;
-        // virtual const std::any* const getRawData();
+        ColumnType get(TID tid) override;
         void print() const noexcept override;
         [[nodiscard]] size_t size() const noexcept override;
         [[nodiscard]] unsigned int getSizeinBytes() const noexcept override;
@@ -92,17 +90,14 @@ namespace CoGaDB
     }
 
     template<class T>
-    bool Column<T>::insert(const std::any &new_value)
+    bool Column<T>::insert(const ColumnType &new_value)
     {
-        if (!new_value.has_value())
+        if (std::holds_alternative<std::monostate>(new_value))
             return false;
-        if (typeid(T) == new_value.type())
-        {
-            T value = std::any_cast<T>(new_value);
-            values_.push_back(value);
-            return true;
-        }
-        return false;
+
+        T value = std::get<T>(new_value);
+        values_.push_back(value);
+        return true;
     }
 
     template<class T>
@@ -121,45 +116,31 @@ namespace CoGaDB
     }
 
     template<class T>
-    bool Column<T>::update(TID tid, const std::any &new_value)
+    bool Column<T>::update(TID tid, const ColumnType &new_value)
     {
-        if (!new_value.has_value())
+        if (std::holds_alternative<std::monostate>(new_value))
             return false;
-        if (typeid(T) == new_value.type())
-        {
-            T value = std::any_cast<T>(new_value);
-            values_[tid] = value;
-            return true;
-        }
-        else
-        {
-            std::cout << "Fatal Error!!! Typemismatch for column " << this->name_ << std::endl;
-        }
-        return false;
+
+        T value = std::get<T>(new_value);
+        values_[tid] = value;
+        return true;
     }
 
     template<class T>
-    bool Column<T>::update(PositionListPtr tids, const std::any &new_value)
+    bool Column<T>::update(PositionListPtr tids, const ColumnType &new_value)
     {
         if (!tids)
             return false;
-        if (!new_value.has_value())
+        if (std::holds_alternative<std::monostate>(new_value))
             return false;
-        if (typeid(T) == new_value.type())
+
+        T value = std::get<T>(new_value);
+        for (unsigned int i = 0; i < tids->size(); i++)
         {
-            T value = std::any_cast<T>(new_value);
-            for (unsigned int i = 0; i < tids->size(); i++)
-            {
-                TID tid = (*tids)[i];
-                values_[tid] = value;
-            }
-            return true;
+            TID tid = (*tids)[i];
+            values_[tid] = value;
         }
-        else
-        {
-            std::cout << "Fatal Error!!! Typemismatch for column " << this->name_ << std::endl;
-        }
-        return false;
+        return true;
     }
 
     template<class T>
@@ -205,15 +186,15 @@ namespace CoGaDB
     }
 
     template<class T>
-    std::any Column<T>::get(TID tid)
+    ColumnType Column<T>::get(TID tid)
     {
         if (tid < values_.size())
-            return std::any(values_[tid]);
+            return values_[tid];
         else
         {
             std::cerr << "fatal Error!!! Invalid TID!!! Attribute: " << this->name_ << " TID: " << tid << std::endl;
         }
-        return std::any();
+        return {};
     }
 
     template<class T>

@@ -3,7 +3,6 @@
 // STL includes
 #include <typeinfo>
 // CoGaDB includes
-#include <any>
 #include <core/global_definitions.hpp>
 #include <memory>
 
@@ -40,13 +39,13 @@ namespace CoGaDB
         /***************** methods *****************/
         /*! \brief appends a value new_Value to end of column
          *  \return true for sucess and false in case an error occured*/
-        virtual bool insert(const std::any &new_Value) = 0;
+        virtual bool insert(const ColumnType &new_Value) = 0;
         /*! \brief updates the value on position tid with a value new_Value
          *  \return true for sucess and false in case an error occured*/
-        virtual bool update(TID tid, const std::any &new_Value) = 0;
+        virtual bool update(TID tid, const ColumnType &new_Value) = 0;
         /*! \brief updates the values specified by the position list with a value new_Value
          *  \return true for sucess and false in case an error occured*/
-        virtual bool update(PositionListPtr tids, const std::any &new_value) = 0;
+        virtual bool update(PositionListPtr tids, const ColumnType &new_value) = 0;
         /*! \brief deletes the value on position tid
          *  \return true for sucess and false in case an error occured*/
         virtual bool remove(TID tid) = 0;
@@ -59,8 +58,8 @@ namespace CoGaDB
         virtual bool clearContent() = 0;
         /*! \brief generic function for fetching a value form a column (slow)
          *  \details check whether the object is valid (e.g., when a tid is not valid, then the returned object is
-         * invalid as well) \return object of type std::any containing the value on position tid*/
-        virtual std::any get(TID tid) = 0; // not const, because operator [] does not provide const return type
+         * invalid as well) \return object of type ColumnType containing the value on position tid*/
+        virtual ColumnType get(TID tid) = 0; // not const, because operator [] does not provide const return type
                                            // and the child classes rely on []
         /*! \brief prints the content of a column*/
         virtual void print() const noexcept = 0;
@@ -78,11 +77,11 @@ namespace CoGaDB
         virtual PositionListPtr sort(SortOrder order = ASCENDING) = 0;
         /*! \brief filters the values of a column according to a filter condition consisting of a comparison value and a
          * ValueComparator (=,<,>) \return PositionListPtr to a PositionList, which represents the result*/
-        virtual PositionListPtr selection(const std::any &value_for_comparison, ValueComparator comp) = 0;
+        virtual PositionListPtr selection(const ColumnType &value_for_comparison, ValueComparator comp) = 0;
         /*! \brief filters the values of a column in parallel according to a filter condition consisting of a comparison
          * value and a ValueComparator (=,<,>) \details the additional parameter specifies the number of threads that
          * may be used to perform the operation \return PositionListPtr to a PositionList, which represents the result*/
-        virtual PositionListPtr parallel_selection(const std::any &value_for_comparison,
+        virtual PositionListPtr parallel_selection(const ColumnType &value_for_comparison,
                                                          ValueComparator comp,
                                                          unsigned int number_of_threads) = 0;
         /*! \brief joins two columns using the hash join algorithm
@@ -97,25 +96,25 @@ namespace CoGaDB
         /***************** column algebra operations *****************/
         /*! \brief adds constant to column
          *  \details for all indeces i holds the following property: B[i]=A[i]+new_Value*/
-        virtual bool add(const std::any &new_Value) = 0;
+        virtual bool add(const ColumnType &new_Value) = 0;
         /*! \brief vector addition of two columns
          *  \details for all indeces i holds the following property: C[i]=A[i]+B[i]*/
         virtual bool add(ColumnPtr column) = 0;
         /*! \brief substracts constant from column
          *  \details for all indeces i holds the following property: B[i]=A[i]-new_Value*/
-        virtual bool minus(const std::any &new_Value) = 0;
+        virtual bool minus(const ColumnType &new_Value) = 0;
         /*! \brief vector substraction of two columns
          *  \details for all indeces i holds the following property: C[i]=A[i]-B[i]*/
         virtual bool minus(ColumnPtr column) = 0;
         /*! \brief multiply constant with column
          *  \details for all indeces i holds the following property: B[i]=A[i]*new_Value*/
-        virtual bool multiply(const std::any &new_Value) = 0;
+        virtual bool multiply(const ColumnType &new_Value) = 0;
         /*! \brief multiply two columns A and B
          *  \details for all indeces i holds the following property: C[i]=A[i]*B[i]*/
         virtual bool multiply(ColumnPtr column) = 0;
         /*! \brief devide values in column by a constant
          *  \details for all indeces i holds the following property: B[i]=A[i]/new_Value*/
-        virtual bool division(const std::any &new_Value) = 0;
+        virtual bool division(const ColumnType &new_Value) = 0;
         /*! \brief devide column A with column B
          *  \details for all indeces i holds the following property: C[i]=A[i]/B[i]*/
         virtual bool division(ColumnPtr column) = 0;
@@ -135,8 +134,6 @@ namespace CoGaDB
         /*! \brief use this method to determine whether the column is materialized or a Lookup Column
          * \return true in case the column is storing the compressed values and false otherwise.*/
         [[nodiscard]] virtual bool isCompressed() const noexcept = 0;
-        /*! \brief returns type information of internal values*/
-        [[nodiscard]] virtual const std::type_info &type() const noexcept = 0;
         /*! \brief returns database type of column (as defined in "SQL" statement)*/
         [[nodiscard]] AttributeType getType() const noexcept;
         /*! \brief returns attribute name of column

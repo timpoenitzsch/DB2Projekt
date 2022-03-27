@@ -1,17 +1,19 @@
 #pragma once
 
-#include <any>
 #include <list>
 #include <map>
 #include <string>
 #include <vector>
+#include <variant>
 
 namespace CoGaDB
 {
 
+    using ColumnType = std::variant<std::monostate,int, float, std::string, bool>;
+
     enum AttributeType
     {
-        INT,
+        INT=1,
         FLOAT,
         VARCHAR,
         BOOLEAN
@@ -46,6 +48,6 @@ namespace CoGaDB
 
     using TableSchema = std::list<Attribut>;
 
-    using Tuple = std::vector<std::any>;
+    using Tuple = std::vector<ColumnType>;
 
 }; // namespace CoGaDB

@@ -43,16 +43,16 @@ if (BUILD_DOC)
     if (DOXYGEN_FOUND)
         # set input and output files
         set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in)
-        set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+        set(DOXYGEN_OUT ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile)
 
         # request to configure the file
         configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
         message("Doxygen build started")
 
         # note the option ALL which allows to build the docs together with the application
-        add_custom_target(doc_doxygen ALL
+        add_custom_target(documentation ALL
                 COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
                 COMMENT "Generating API documentation with Doxygen"
                 VERBATIM)
     else (DOXYGEN_FOUND)
@@ -60,15 +60,18 @@ if (BUILD_DOC)
     endif (DOXYGEN_FOUND)
 endif()
 
-include_directories(include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+#configure path for test data
 configure_file(include/config.hpp.in include/config.hpp)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
-#add source
+
+#enable support for testing with catch in cmake
 enable_testing()
 include(CTest)
 include(${Catch2_SOURCE_DIR}/contrib/Catch.cmake)
 
+#add source
 add_subdirectory(src)
 
 #TODO: custom release command with archiving
