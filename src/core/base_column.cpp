@@ -1,4 +1,3 @@
-
 #include <core/base_column.hpp>
 #include <core/column.hpp>
 #include <iostream>
@@ -21,20 +20,20 @@ namespace CoGaDB
         return name_;
     }
 
-    ColumnPtr createColumn(AttributeType type, const std::string &name)
+    std::unique_ptr<ColumnBase> createColumn(AttributeType type, const std::string &name)
     {
-        ColumnPtr ptr;
+        std::unique_ptr<ColumnBase> ptr;
         if (type == INT)
         {
-            ptr = ColumnPtr(new Column<int>(name, INT));
+            ptr = std::make_unique<Column<int>>(name, INT);
         }
         else if (type == FLOAT)
         {
-            ptr = ColumnPtr(new Column<float>(name, FLOAT));
+            ptr = std::make_unique<Column<float>>(name, FLOAT);
         }
         else if (type == VARCHAR)
         {
-            ptr = ColumnPtr(new Column<std::string>(name, VARCHAR));
+            ptr = std::make_unique<Column<std::string>>(name, VARCHAR);
         }
         else if (type == BOOLEAN)
         {

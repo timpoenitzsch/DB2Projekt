@@ -2,18 +2,19 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
-#include <vector>
 #include <variant>
+#include <vector>
 
 namespace CoGaDB
 {
 
-    using ColumnType = std::variant<std::monostate,int, float, std::string, bool>;
+    using ColumnType = std::variant<std::monostate, int, float, std::string, bool>;
 
     enum AttributeType
     {
-        INT=1,
+        INT = 1,
         FLOAT,
         VARCHAR,
         BOOLEAN
@@ -41,13 +42,6 @@ namespace CoGaDB
     };
 
     using TID = unsigned int;
-
-    using TID_Pair = std::pair<TID, TID>;
-
     using Attribut = std::pair<AttributeType, std::string>;
-
-    using TableSchema = std::list<Attribut>;
-
-    using Tuple = std::vector<ColumnType>;
 
 }; // namespace CoGaDB

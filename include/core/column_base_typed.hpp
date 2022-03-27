@@ -3,17 +3,17 @@
 
 #include <algorithm>
 #include <any>
-#include <unordered_map>
+#include <cassert>
 #include <core/base_column.hpp>
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <unordered_map>
 #include <utility>
-#include <cassert>
 
 //#include <core/column.hpp>
 
-/*! \brief The global namespace of the programming tasks, to avoid name claches with other libraries.*/
+/*! \brief The global namespace of the programming tasks, to avoid name clashes with other libraries.*/
 namespace CoGaDB
 {
 
@@ -21,8 +21,8 @@ namespace CoGaDB
      *
      *
      *  \brief     This class represents a column with type T, is the base class for all typed column classes and allows
-     * a uniform handling of columns of a certain type T. \details   This class is indentended to be a base class, so it
-     * has a virtual destruktor and pure virtual methods, which need to be implemented in a derived class. Furthermore,
+     * a uniform handling of columns of a certain type T. \details   This class is intended to be a base class, so it
+     * has a virtual destructor and pure virtual methods, which need to be implemented in a derived class. Furthermore,
      * it declares pure virtual methods to allow a generic handling of typed columns, e.g., operator[]. All algorithms
      * can be applied to a typed column, because of this operator. This abstracts from a columns implementation detail,
      * e.g., whether they are compressed or not. \author    Sebastian Breß \version   0.2 \date      2013 \copyright GNU
@@ -42,11 +42,11 @@ namespace CoGaDB
         bool insert(const ColumnType &new_Value) override = 0;
         virtual bool insert(const T &new_Value) = 0;
         bool update(TID tid, const ColumnType &new_value) override = 0;
-        bool update(PositionListPtr tid, const ColumnType &new_value) override = 0;
+        bool update(PositionList &tid, const ColumnType &new_value) override = 0;
 
         bool remove(TID tid) override = 0;
         // assumes tid list is sorted ascending
-        bool remove(PositionListPtr tid) override = 0;
+        bool remove(PositionList &tid) override = 0;
         bool clearContent() override = 0;
 
         ColumnType get(TID tid) override = 0;
@@ -55,30 +55,30 @@ namespace CoGaDB
         [[nodiscard]] size_t size() const noexcept override = 0;
         [[nodiscard]] unsigned int getSizeinBytes() const noexcept override = 0;
 
-        [[nodiscard]] ColumnPtr copy() const override = 0;
+        [[nodiscard]] std::unique_ptr<ColumnBase> copy() const override = 0;
         /***************** relational operations on Columns which return lookup tables *****************/
-        PositionListPtr sort(SortOrder order) override;
-        PositionListPtr selection(const ColumnType &value_for_comparison, ValueComparator comp) override;
-        PositionListPtr parallel_selection(const ColumnType &value_for_comparison,
-                                           ValueComparator comp,
-                                           unsigned int number_of_threads) override;
+        PositionList sort(SortOrder order) override;
+        PositionList selection(const ColumnType &value_for_comparison, ValueComparator comp) override;
+        PositionList parallel_selection(const ColumnType &value_for_comparison,
+                                        ValueComparator comp,
+                                        unsigned int number_of_threads) override;
         // join algorithms
-        PositionListPairPtr hash_join(ColumnPtr join_column) override;
-        PositionListPairPtr sort_merge_join(ColumnPtr join_column) override;
-        PositionListPairPtr nested_loop_join(ColumnPtr join_column) override;
+        PositionListPair hash_join(ColumnBase &join_column) override;
+        PositionListPair sort_merge_join(ColumnBase &join_column) override;
+        PositionListPair nested_loop_join(ColumnBase &join_column) override;
 
         bool add(const ColumnType &new_Value) override;
         // vector addition between columns
-        bool add(ColumnPtr join_column) override;
+        bool add(ColumnBase &join_column) override;
 
         bool minus(const ColumnType &new_Value) override;
-        bool minus(ColumnPtr join_column) override;
+        bool minus(ColumnBase &join_column) override;
 
         bool multiply(const ColumnType &new_Value) override;
-        bool multiply(ColumnPtr join_column) override;
+        bool multiply(ColumnBase &join_column) override;
 
         bool division(const ColumnType &new_Value) override;
-        bool division(ColumnPtr join_column) override;
+        bool division(ColumnBase &join_column) override;
 
         // template <typename U, typename BinaryOperator>
         // std::pair<ColumnPtr,ColumnPtr> aggregate_by_keys(ColumnBaseTyped<U>* keys, BinaryOperator binary_op) const;
@@ -104,17 +104,15 @@ namespace CoGaDB
     ColumnBaseTyped<T>::~ColumnBaseTyped() = default;
 
     template<class T>
-    PositionListPtr ColumnBaseTyped<T>::sort(SortOrder order)
+    PositionList ColumnBaseTyped<T>::sort(SortOrder order)
     {
-        PositionListPtr ids = std::make_shared<PositionList>();
+        PositionList ids;
         std::vector<std::pair<T, TID>> v;
 
         for (unsigned int i = 0; i < this->size(); i++)
         {
             v.push_back(std::pair<T, TID>((*this)[i], i));
         }
-
-        // TODO: change implementation, so that no copy operations are required -> use zip iterators!
 
         if (order == ASCENDING)
         {
@@ -131,30 +129,26 @@ namespace CoGaDB
             std::cout << "FATAL ERROR: ColumnBaseTyped<T>::sort(): Unknown Sorting Order!" << std::endl;
         }
 
-        for (unsigned int i = 0; i < v.size(); i++)
-        {
-            ids->push_back(v[i].second);
-        }
+        for (auto &elem : v)
+            ids.push_back(elem.second);
 
         return ids;
     }
 
     template<class T>
-    PositionListPtr ColumnBaseTyped<T>::parallel_selection(const ColumnType &, const ValueComparator, unsigned int)
+    PositionList ColumnBaseTyped<T>::parallel_selection(const ColumnType &, const ValueComparator, unsigned int)
     {
-        PositionListPtr result_tids(new PositionList());
+        PositionList result_tids;
 
         return result_tids;
     }
 
     template<class T>
-    PositionListPtr ColumnBaseTyped<T>::selection(const ColumnType &value_for_comparison, const ValueComparator comp)
+    PositionList ColumnBaseTyped<T>::selection(const ColumnType &value_for_comparison, const ValueComparator comp)
     {
         T value = std::get<T>(value_for_comparison);
 
-        PositionListPtr result_tids;
-
-        result_tids = std::make_shared<PositionList>();
+        PositionList result_tids;
 
         if (!quiet)
             std::cout << "Using CPU for Selection..." << std::endl;
@@ -168,7 +162,7 @@ namespace CoGaDB
                 if (value == (*this)[i])
                 {
                     // result_table->insert(this->fetchTuple(i));
-                    result_tids->push_back(i);
+                    result_tids.push_back(i);
                 }
             }
             else if (comp == LESSER)
@@ -176,14 +170,14 @@ namespace CoGaDB
                 if ((*this)[i] < value)
                 {
                     // result_table->insert(this->fetchTuple(i));
-                    result_tids->push_back(i);
+                    result_tids.push_back(i);
                 }
             }
             else if (comp == GREATER)
             {
                 if ((*this)[i] > value)
                 {
-                    result_tids->push_back(i);
+                    result_tids.push_back(i);
                     // result_table->insert(this->fetchTuple(i));
                 }
             }
@@ -197,24 +191,21 @@ namespace CoGaDB
     }
 
     template<class T>
-    PositionListPairPtr ColumnBaseTyped<T>::hash_join(ColumnPtr join_column_)
+    PositionListPair ColumnBaseTyped<T>::hash_join(ColumnBase &join_column_)
     {
         typedef std::unordered_multimap<T, TID, std::hash<T>, std::equal_to<T>> HashTable;
 
-        if (join_column_->getType() != getType())
+        if (join_column_.getType() != getType())
         {
-            std::cerr << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_->getName()
+            std::cerr << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_.getName()
                       << std::endl;
             std::cerr << "File: " << __FILE__ << " Line: " << __LINE__ << std::endl;
             std::abort();
         }
 
-        std::shared_ptr<ColumnBaseTyped<T>> join_column =
-            std::static_pointer_cast<ColumnBaseTyped<T>>(join_column_); // static_cast<IntColumnPtr>(column1);
+        auto &join_column = reinterpret_cast<ColumnBaseTyped<T> &>(join_column_); // static_cast<IntColumnPtr>(column1);
 
-        PositionListPairPtr join_tids(new PositionListPair());
-        join_tids->first = std::make_shared<PositionList>();
-        join_tids->second = std::make_shared<PositionList>();
+        PositionListPair join_tids;
 
         // create hash table
         HashTable hashtable;
@@ -222,16 +213,16 @@ namespace CoGaDB
             hashtable.insert(std::pair<T, TID>((*this)[i], i));
 
         // probe larger relation
-        for (unsigned int i = 0; i < join_column->size(); i++)
+        for (unsigned int i = 0; i < join_column.size(); i++)
         {
             std::pair<typename HashTable::iterator, typename HashTable::iterator> range =
-                hashtable.equal_range((*join_column)[i]);
+                hashtable.equal_range(join_column[i]);
             for (typename HashTable::iterator it = range.first; it != range.second; it++)
             {
-                if (it->first == (*join_column)[i])
+                if (it->first == join_column[i])
                 {
-                    join_tids->first->push_back(it->second);
-                    join_tids->second->push_back(i);
+                    join_tids.first.push_back(it->second);
+                    join_tids.second.push_back(i);
                     // cout << "match! " << it->second << ", " << i << "	"  << it->first << endl;
                 }
             }
@@ -241,55 +232,46 @@ namespace CoGaDB
     }
 
     template<class Type>
-    PositionListPairPtr ColumnBaseTyped<Type>::sort_merge_join(ColumnPtr join_column_)
+    PositionListPair ColumnBaseTyped<Type>::sort_merge_join(ColumnBase &join_column_)
     {
-        if (join_column_->getType() != getType())
+        if (join_column_.getType() != getType())
         {
-            std::cout << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_->getName()
+            std::cout << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_.getName()
                       << std::endl;
             std::cout << "File: " << __FILE__ << " Line: " << __LINE__ << std::endl;
             abort();
         }
 
-        std::shared_ptr<ColumnBaseTyped<Type>> join_column =
-            std::static_pointer_cast<ColumnBaseTyped<Type>>(join_column_); // static_cast<IntColumnPtr>(column1);
-
-        PositionListPairPtr join_tids(new PositionListPair());
-        join_tids->first = std::make_shared<PositionList>();
-        join_tids->second = std::make_shared<PositionList>();
-
+        PositionListPair join_tids;
         return join_tids;
     }
 
     template<class Type>
-    PositionListPairPtr ColumnBaseTyped<Type>::nested_loop_join(ColumnPtr join_column_)
+    PositionListPair ColumnBaseTyped<Type>::nested_loop_join(ColumnBase &join_column_)
     {
-        assert(join_column_ != nullptr);
-        if (join_column_->getType() != getType())
+        if (join_column_.getType() != getType())
         {
-            std::cout << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_->getName()
+            std::cout << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_.getName()
                       << std::endl;
             std::cout << "File: " << __FILE__ << " Line: " << __LINE__ << std::endl;
             exit(-1);
         }
 
-        std::shared_ptr<ColumnBaseTyped<Type>> join_column =
-            std::static_pointer_cast<ColumnBaseTyped<Type>>(join_column_); // static_cast<IntColumnPtr>(column1);
+        auto &join_column =
+            reinterpret_cast<ColumnBaseTyped<Type> &>(join_column_); // static_cast<IntColumnPtr>(column1);
 
-        PositionListPairPtr join_tids(new PositionListPair());
-        join_tids->first = std::make_shared<PositionList>();
-        join_tids->second = std::make_shared<PositionList>();
+        PositionListPair join_tids;
 
         for (unsigned int i = 0; i < this->size(); i++)
         {
-            for (unsigned int j = 0; j < join_column->size(); j++)
+            for (unsigned int j = 0; j < join_column.size(); j++)
             {
-                if ((*this)[i] == (*join_column)[j])
+                if ((*this)[i] == join_column[j])
                 {
                     if (debug)
                         std::cout << "MATCH: (" << i << "," << j << ")" << std::endl;
-                    join_tids->first->push_back(i);
-                    join_tids->second->push_back(j);
+                    join_tids.first.push_back(i);
+                    join_tids.second.push_back(j);
                 }
             }
         }
@@ -318,7 +300,7 @@ namespace CoGaDB
         if (std::holds_alternative<std::monostate>(new_value))
             return false;
 
-        Type value = std::get<Type>(new_value);
+        auto value = std::get<Type>(new_value);
         // std::transform(myvec.begin(), myvec.end(), myvec.begin(),
         // bind2nd(std::plus<double>(), 1.0));
         for (unsigned int i = 0; i < this->size(); i++)
@@ -329,15 +311,14 @@ namespace CoGaDB
     }
 
     template<class Type>
-    bool ColumnBaseTyped<Type>::add(ColumnPtr column)
+    bool ColumnBaseTyped<Type>::add(ColumnBase &column)
     {
         // std::transform ( first, first+5, second, results, std::plus<int>() );
-        std::shared_ptr<ColumnBaseTyped<Type>> typed_column = std::static_pointer_cast<ColumnBaseTyped<Type>>(column);
-        if (!column)
-            return false;
+        auto &typed_column = dynamic_cast<ColumnBaseTyped<Type> &>(column);
+
         for (unsigned int i = 0; i < this->size(); i++)
         {
-            this->operator[](i) += typed_column->operator[](i);
+            this->operator[](i) += typed_column[i];
         }
         return true;
     }
@@ -350,7 +331,7 @@ namespace CoGaDB
         if (std::holds_alternative<std::monostate>(new_value))
             return false;
 
-        Type value = std::any_cast<Type>(new_value);
+        auto value = std::get<Type>(new_value);
         for (unsigned int i = 0; i < this->size(); i++)
         {
             this->operator[](i) -= value;
@@ -359,15 +340,14 @@ namespace CoGaDB
     }
 
     template<class Type>
-    bool ColumnBaseTyped<Type>::minus(ColumnPtr column)
+    bool ColumnBaseTyped<Type>::minus(ColumnBase &column)
     {
         // std::transform ( first, first+5, second, results, std::plus<int>() );
-        std::shared_ptr<ColumnBaseTyped<Type>> typed_column = std::static_pointer_cast<ColumnBaseTyped<Type>>(column);
-        if (!column)
-            return false;
+        auto &typed_column = reinterpret_cast<ColumnBaseTyped<Type> &>(column);
+
         for (unsigned int i = 0; i < this->size(); i++)
         {
-            this->operator[](i) -= typed_column->operator[](i);
+            this->operator[](i) -= typed_column[i];
         }
         return true;
     }
@@ -387,15 +367,14 @@ namespace CoGaDB
     }
 
     template<class Type>
-    bool ColumnBaseTyped<Type>::multiply(ColumnPtr column)
+    bool ColumnBaseTyped<Type>::multiply(ColumnBase &column)
     {
         // std::transform ( first, first+5, second, results, std::plus<int>() );
-        std::shared_ptr<ColumnBaseTyped<Type>> typed_column = std::static_pointer_cast<ColumnBaseTyped<Type>>(column);
-        if (!column)
-            return false;
+        auto &typed_column = dynamic_cast<ColumnBaseTyped<Type> &>(column);
+
         for (unsigned int i = 0; i < this->size(); i++)
         {
-            this->operator[](i) *= typed_column->operator[](i);
+            this->operator[](i) *= typed_column[i];
         }
         return true;
     }
@@ -418,15 +397,14 @@ namespace CoGaDB
     }
 
     template<class Type>
-    bool ColumnBaseTyped<Type>::division(ColumnPtr column)
+    bool ColumnBaseTyped<Type>::division(ColumnBase &column)
     {
         // std::transform ( first, first+5, second, results, std::plus<int>() );
-        std::shared_ptr<ColumnBaseTyped<Type>> typed_column = std::static_pointer_cast<ColumnBaseTyped<Type>>(column);
-        if (!column)
-            return false;
+        auto &typed_column = reinterpret_cast<ColumnBaseTyped<Type> &>(column);
+
         for (unsigned int i = 0; i < this->size(); i++)
         {
-            this->operator[](i) /= typed_column->operator[](i);
+            this->operator[](i) /= typed_column[i];
         }
         return true;
     }
@@ -438,7 +416,7 @@ namespace CoGaDB
         return false;
     }
     template<>
-    inline bool ColumnBaseTyped<std::string>::add(ColumnPtr)
+    inline bool ColumnBaseTyped<std::string>::add(ColumnBase &)
     {
         return false;
     }
@@ -449,7 +427,7 @@ namespace CoGaDB
         return false;
     }
     template<>
-    inline bool ColumnBaseTyped<std::string>::minus(ColumnPtr)
+    inline bool ColumnBaseTyped<std::string>::minus(ColumnBase &)
     {
         return false;
     }
@@ -460,7 +438,7 @@ namespace CoGaDB
         return false;
     }
     template<>
-    inline bool ColumnBaseTyped<std::string>::multiply(ColumnPtr)
+    inline bool ColumnBaseTyped<std::string>::multiply(ColumnBase &)
     {
         return false;
     }
@@ -471,7 +449,7 @@ namespace CoGaDB
         return false;
     }
     template<>
-    inline bool ColumnBaseTyped<std::string>::division(ColumnPtr)
+    inline bool ColumnBaseTyped<std::string>::division(ColumnBase &)
     {
         return false;
     }

@@ -25,11 +25,11 @@ namespace CoGaDB
         bool insert(InputIterator first, InputIterator last);
 
         bool update(TID tid, const ColumnType &new_value) override;
-        bool update(PositionListPtr tid, const ColumnType &new_value) override;
+        bool update(PositionList &tid, const ColumnType &new_value) override;
 
         bool remove(TID tid) override;
         // assumes tid list is sorted ascending
-        bool remove(PositionListPtr tid) override;
+        bool remove(PositionList &tid) override;
         bool clearContent() override;
 
         ColumnType get(TID tid) override;
@@ -37,7 +37,7 @@ namespace CoGaDB
         [[nodiscard]] size_t size() const noexcept override;
         [[nodiscard]] unsigned int getSizeinBytes() const noexcept override;
 
-        [[nodiscard]] ColumnPtr copy() const override;
+        [[nodiscard]] std::unique_ptr<ColumnBase> copy() const override;
 
         void store(const std::string &path) override;
         void load(const std::string &path) override;
@@ -127,17 +127,14 @@ namespace CoGaDB
     }
 
     template<class T>
-    bool Column<T>::update(PositionListPtr tids, const ColumnType &new_value)
+    bool Column<T>::update(PositionList &tids, const ColumnType &new_value)
     {
-        if (!tids)
-            return false;
         if (std::holds_alternative<std::monostate>(new_value))
             return false;
 
         T value = std::get<T>(new_value);
-        for (unsigned int i = 0; i < tids->size(); i++)
+        for (unsigned int tid : tids)
         {
-            TID tid = (*tids)[i];
             values_[tid] = value;
         }
         return true;
@@ -151,29 +148,14 @@ namespace CoGaDB
     }
 
     template<class T>
-    bool Column<T>::remove(PositionListPtr tids)
+    bool Column<T>::remove(PositionList &tids)
     {
-        if (!tids)
-            return false;
         // test whether tid list has at least one element, if not, return with error
-        if (tids->empty())
+        if (tids.empty())
             return false;
 
-        // assert();
-
-        typename PositionList::reverse_iterator rit;
-
-        for (rit = tids->rbegin(); rit != tids->rend(); ++rit)
+        for (auto rit = tids.rbegin(); rit != tids.rend(); ++rit)
             values_.erase(values_.begin() + (*rit));
-
-        /*
-        //delete tuples in reverse order, otherwise the first deletion would invalidate all other tids
-        unsigned int i=tids->size()-1;
-        while(true)
-            TID = (*tids)[i];
-            values_.erase(values_.begin()+tid);
-            if(i==0) break;
-        }*/
 
         return true;
     }
@@ -213,9 +195,9 @@ namespace CoGaDB
         return values_.size();
     }
     template<class T>
-    ColumnPtr Column<T>::copy() const
+    std::unique_ptr<ColumnBase> Column<T>::copy() const
     {
-        return ColumnPtr(new Column<T>(*this));
+        return std::make_unique<Column<T>>(*this);
     }
     /***************** relational operations on Columns which return lookup tables *****************/
     //	template<class T>

@@ -26,11 +26,11 @@ namespace CoGaDB
         virtual bool insert(const T &new_value) = 0;
 
         virtual bool update(TID tid, const ColumnType &new_value) = 0;
-        virtual bool update(PositionListPtr tid, const ColumnType &new_value) = 0;
+        virtual bool update(PositionList &tid, const ColumnType &new_value) = 0;
 
         virtual bool remove(TID tid) = 0;
         // assumes tid list is sorted ascending
-        virtual bool remove(PositionListPtr tid) = 0;
+        virtual bool remove(PositionList &tid) = 0;
         virtual bool clearContent() = 0;
 
         virtual ColumnType get(TID tid) = 0;
@@ -39,7 +39,7 @@ namespace CoGaDB
         [[nodiscard]] virtual size_t size() const noexcept = 0;
         [[nodiscard]] virtual unsigned int getSizeinBytes() const noexcept = 0;
 
-        [[nodiscard]] virtual ColumnPtr copy() const = 0;
+        [[nodiscard]] virtual std::unique_ptr<ColumnBase> copy() const = 0;
 
         virtual void store(const std::string &path) = 0;
         virtual void load(const std::string &path) = 0;

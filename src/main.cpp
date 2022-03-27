@@ -1,8 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "core/column.hpp"
-//TODO: include your compressed column implementations here
+// TODO: include your compressed column implementations here
 #include "config.hpp"
-
 #include "tests/utils.hpp"
 
 #include <catch2/catch.hpp>
@@ -23,12 +22,11 @@ struct Column_Test_Fixture
 
 using namespace CoGaDB;
 
-TEMPLATE_PRODUCT_TEST_CASE_METHOD(
-    Column_Test_Fixture,
-    "Template test case method with test types specified inside std::tuple",
-    "[class][template]",
-    (Column /*TODO: insert your column types here, separated by comma*/),
-    (int, float, std::string))
+TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
+                                  "Template test case method with test types specified inside std::tuple",
+                                  "[class][template]",
+                                  (Column /*TODO: insert your column types here, separated by comma*/),
+                                  (int, float, std::string))
 {
     using ValueType = typename Column_Test_Fixture<TestType>::ValueType;
     auto &col_one = Column_Test_Fixture<TestType>::col_one;
@@ -42,10 +40,10 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(
     REQUIRE_THAT(col_one, isEqual<TestType>(reference_data));
 
     /****** VIRTUAL COPY CONSTRUCTOR TEST ******/
-    ColumnPtr copy = col_one.copy();
+    std::unique_ptr<ColumnBase> copy = col_one.copy();
     REQUIRE(copy);
-    auto &cpy =  *(std::static_pointer_cast<TestType>(copy));
-     REQUIRE(cpy == col_one);
+    auto &cpy = dynamic_cast<TestType &>(*copy);
+    REQUIRE(cpy == col_one);
 
     /****** UPDATE TEST ******/
     std::uniform_int_distribution dist(0, 100);
