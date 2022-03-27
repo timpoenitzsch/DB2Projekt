@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "core/compressed_column.hpp"
+#include "compressed_column.hpp"
 #include "core/global_definitions.hpp"
 
 namespace CoGaDB

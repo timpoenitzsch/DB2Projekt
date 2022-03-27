@@ -37,7 +37,6 @@ namespace CoGaDB
         }
         else if (type == BOOLEAN)
         {
-            // ptr=ColumnPtr(new Column<bool>(name,BOOLEAN));
             std::cerr << "Fatal Error! invalid AttributeType: " << type << " for Column: " << name
                       << " Note: bool is currently not supported, will be added again in the future!" << std::endl;
         }

@@ -10,7 +10,7 @@
 #include <core/base_column.hpp>
 #include <core/column.hpp>
 #include <core/column_base_typed.hpp>
-#include <core/compressed_column.hpp>
+#include <compression/compressed_column.hpp>
 #include <core/global_definitions.hpp>
 #include <random>
 #include <string>
