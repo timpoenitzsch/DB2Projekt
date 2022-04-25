@@ -41,7 +41,7 @@ namespace CoGaDB
         // virtual const std::any* const getRawData()=0;
         virtual void print() const noexcept;
         [[nodiscard]] virtual size_t size() const noexcept;
-        [[nodiscard]] virtual unsigned int getSizeinBytes() const noexcept;
+        [[nodiscard]] virtual unsigned int getSizeInBytes() const noexcept;
 
         [[nodiscard]] virtual std::unique_ptr<ColumnBase> copy() const;
 
@@ -157,7 +157,7 @@ namespace CoGaDB
     }
 
     template<class T>
-    unsigned int DictionaryCompressedColumn<T>::getSizeinBytes() const noexcept
+    unsigned int DictionaryCompressedColumn<T>::getSizeInBytes() const noexcept
     {
         return 0; // return values_.capacity()*sizeof(T);
     }

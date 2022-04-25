@@ -15,7 +15,7 @@ namespace CoGaDB
      *
      *
      *  \brief     This class represents a generic column, is the base class for all column classes and allows a uniform
-     * handling of columns. \details   This class is indentended to be a base class, so it has a virtual destruktor and
+     * handling of columns. \details   This class is intended to be a base class, so it has a virtual destructor and
      * pure virtual methods, which need to be implemented in a derived class. \author    Sebastian Breß \version   0.2
      *  \date      2013
      *  \copyright GNU LESSER GENERAL PUBLIC LICENSE - Version 3, http://www.gnu.org/licenses/lgpl-3.0.txt
@@ -29,23 +29,23 @@ namespace CoGaDB
         virtual ~ColumnBase();
         /***************** methods *****************/
         /*! \brief appends a value new_Value to end of column
-         *  \return true for sucess and false in case an error occurred*/
+         *  \return true for success and false in case an error occurred*/
         virtual bool insert(const ColumnType &new_Value) = 0;
         /*! \brief updates the value on position tid with a value new_Value
-         *  \return true for sucess and false in case an error occurred*/
+         *  \return true for success and false in case an error occurred*/
         virtual bool update(TID tid, const ColumnType &new_Value) = 0;
         /*! \brief updates the values specified by the position list with a value new_Value
-         *  \return true for sucess and false in case an error occurred*/
+         *  \return true for success and false in case an error occurred*/
         virtual bool update(PositionList &tids, const ColumnType &new_value) = 0;
         /*! \brief deletes the value on position tid
-         *  \return true for sucess and false in case an error occurred*/
+         *  \return true for success and false in case an error occurred*/
         virtual bool remove(TID tid) = 0;
         /*! \brief deletes the values defined in the position list
          *  \details assumes tid list is sorted ascending
-         *  \return true for sucess and false in case an error occurred*/
+         *  \return true for success and false in case an error occurred*/
         virtual bool remove(PositionList &tid) = 0;
         /*! \brief deletes all values stored in the column
-         *  \return true for sucess and false in case an error occurred*/
+         *  \return true for success and false in case an error occurred*/
         virtual bool clearContent() = 0;
         /*! \brief generic function for fetching a value form a column (slow)
          *  \details check whether the object is valid (e.g., when a tid is not valid, then the returned object is
@@ -57,7 +57,7 @@ namespace CoGaDB
         /*! \brief returns the number of values (rows) in a column*/
         [[nodiscard]] virtual size_t size() const noexcept = 0;
         /*! \brief returns the size in bytes the column consumes in main memory*/
-        [[nodiscard]] virtual unsigned int getSizeinBytes() const noexcept = 0;
+        [[nodiscard]] virtual unsigned int getSizeInBytes() const noexcept = 0;
         /*! \brief virtual copy constructor
          * \return a ColumnPtr to an exact copy of the current column*/
         [[nodiscard]] virtual std::unique_ptr<ColumnBase> copy() const = 0;
@@ -86,36 +86,36 @@ namespace CoGaDB
         virtual PositionListPair nested_loop_join(ColumnBase &join_column) = 0;
         /***************** column algebra operations *****************/
         /*! \brief adds constant to column
-         *  \details for all indeces i holds the following property: B[i]=A[i]+new_Value*/
+         *  \details for all indices i holds the following property: B[i]=A[i]+new_Value*/
         virtual bool add(const ColumnType &new_Value) = 0;
         /*! \brief vector addition of two columns
-         *  \details for all indeces i holds the following property: C[i]=A[i]+B[i]*/
+         *  \details for all indices i holds the following property: C[i]=A[i]+B[i]*/
         virtual bool add(ColumnBase &column) = 0;
-        /*! \brief substracts constant from column
-         *  \details for all indeces i holds the following property: B[i]=A[i]-new_Value*/
+        /*! \brief subtracts constant from column
+         *  \details for all indices i holds the following property: B[i]=A[i]-new_Value*/
         virtual bool minus(const ColumnType &new_Value) = 0;
-        /*! \brief vector substraction of two columns
-         *  \details for all indeces i holds the following property: C[i]=A[i]-B[i]*/
+        /*! \brief vector subtraction of two columns
+         *  \details for all indices i holds the following property: C[i]=A[i]-B[i]*/
         virtual bool minus(ColumnBase &column) = 0;
         /*! \brief multiply constant with column
-         *  \details for all indeces i holds the following property: B[i]=A[i]*new_Value*/
+         *  \details for all indices i holds the following property: B[i]=A[i]*new_Value*/
         virtual bool multiply(const ColumnType &new_Value) = 0;
         /*! \brief multiply two columns A and B
-         *  \details for all indeces i holds the following property: C[i]=A[i]*B[i]*/
+         *  \details for all indices i holds the following property: C[i]=A[i]*B[i]*/
         virtual bool multiply(ColumnBase &column) = 0;
-        /*! \brief devide values in column by a constant
-         *  \details for all indeces i holds the following property: B[i]=A[i]/new_Value*/
+        /*! \brief divide values in column by a constant
+         *  \details for all indices i holds the following property: B[i]=A[i]/new_Value*/
         virtual bool division(const ColumnType &new_Value) = 0;
-        /*! \brief devide column A with column B
-         *  \details for all indeces i holds the following property: C[i]=A[i]/B[i]*/
+        /*! \brief divide column A with column B
+         *  \details for all indices i holds the following property: C[i]=A[i]/B[i]*/
         virtual bool division(ColumnBase &column) = 0;
-        /***************** persistency operations *****************/
+        /***************** persistence operations *****************/
         /*! \brief store a column on the disc
-         *  \return true for sucess and false in case an error occured*/
+         *  \return true for success and false in case an error occurred*/
         virtual void store(const std::string &path) = 0;
         /*! \brief load column from disc
          *  \details calling load on a column that is not empty yields undefined behaviour
-         *  \return true for sucess and false in case an error occured*/
+         *  \return true for success and false in case an error occurred*/
         virtual void load(const std::string &path) = 0;
         /*! \brief use this method to determine whether the column is materialized or a Lookup Column
          * \return true in case the column is storing the plain values (without compression) and false in case the

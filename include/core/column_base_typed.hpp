@@ -53,7 +53,7 @@ namespace CoGaDB
         // virtual const std::any* const getRawData()=0;
         void print() const noexcept override = 0;
         [[nodiscard]] size_t size() const noexcept override = 0;
-        [[nodiscard]] unsigned int getSizeinBytes() const noexcept override = 0;
+        [[nodiscard]] unsigned int getSizeInBytes() const noexcept override = 0;
 
         [[nodiscard]] std::unique_ptr<ColumnBase> copy() const override = 0;
         /***************** relational operations on Columns which return lookup tables *****************/
@@ -197,13 +197,13 @@ namespace CoGaDB
 
         if (join_column_.getType() != getType())
         {
-            std::cerr << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_.getName()
+            std::cerr << "Fatal Error!!! Type mismatch for columns " << this->name_ << " and " << join_column_.getName()
                       << std::endl;
             std::cerr << "File: " << __FILE__ << " Line: " << __LINE__ << std::endl;
             std::abort();
         }
 
-        auto &join_column = reinterpret_cast<ColumnBaseTyped<T> &>(join_column_); // static_cast<IntColumnPtr>(column1);
+        auto &join_column = reinterpret_cast<ColumnBaseTyped<T> &>(join_column_);
 
         PositionListPair join_tids;
 
@@ -236,7 +236,7 @@ namespace CoGaDB
     {
         if (join_column_.getType() != getType())
         {
-            std::cout << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_.getName()
+            std::cout << "Fatal Error!!! Type mismatch for columns " << this->name_ << " and " << join_column_.getName()
                       << std::endl;
             std::cout << "File: " << __FILE__ << " Line: " << __LINE__ << std::endl;
             abort();
@@ -251,7 +251,7 @@ namespace CoGaDB
     {
         if (join_column_.getType() != getType())
         {
-            std::cout << "Fatal Error!!! Typemismatch for columns " << this->name_ << " and " << join_column_.getName()
+            std::cout << "Fatal Error!!! Type mismatch for columns " << this->name_ << " and " << join_column_.getName()
                       << std::endl;
             std::cout << "File: " << __FILE__ << " Line: " << __LINE__ << std::endl;
             exit(-1);
@@ -301,8 +301,7 @@ namespace CoGaDB
             return false;
 
         auto value = std::get<Type>(new_value);
-        // std::transform(myvec.begin(), myvec.end(), myvec.begin(),
-        // bind2nd(std::plus<double>(), 1.0));
+
         for (unsigned int i = 0; i < this->size(); i++)
         {
             this->operator[](i) += value;
@@ -386,7 +385,7 @@ namespace CoGaDB
             return false;
 
         Type value = std::any_cast<Type>(new_value);
-        // check that we do not devide by zero
+        // check that we do not divide by zero
         if (value == 0)
             return false;
         for (unsigned int i = 0; i < this->size(); i++)
@@ -409,7 +408,7 @@ namespace CoGaDB
         return true;
     }
 
-    // total tempalte specializations, because numeric computations are undefined on strings
+    // total template specializations, because numeric computations are undefined on strings
     template<>
     inline bool ColumnBaseTyped<std::string>::add(const ColumnType &)
     {

@@ -35,7 +35,7 @@ namespace CoGaDB
         ColumnType get(TID tid) override;
         void print() const noexcept override;
         [[nodiscard]] size_t size() const noexcept override;
-        [[nodiscard]] unsigned int getSizeinBytes() const noexcept override;
+        [[nodiscard]] unsigned int getSizeInBytes() const noexcept override;
 
         [[nodiscard]] std::unique_ptr<ColumnBase> copy() const override;
 
@@ -229,12 +229,9 @@ namespace CoGaDB
     void Column<T>::load(const std::string &path_)
     {
         std::string path(path_);
-        // std::cout << "Loading column '" << this->name_ << "' from path '" << path << "'..." << std::endl;
-        // string path("data/");
         path += "/";
         path += this->name_;
 
-        // std::cout << "Opening File '" << path << "'..." << std::endl;
         std::ifstream infile(path.c_str(), std::ios_base::binary | std::ios_base::in);
         cereal::PortableBinaryInputArchive ia(infile);
         ia(*this);
@@ -244,12 +241,9 @@ namespace CoGaDB
     void Column<T>::store(const std::string &path_)
     {
         std::string path(path_);
-        // std::cout << "Loading column '" << this->name_ << "' from path '" << path << "'..." << std::endl;
-        // string path("data/");
         path += "/";
         path += this->name_;
 
-        // std::cout << "Opening File '" << path << "'..." << std::endl;
         std::ofstream outfile(path.c_str(), std::ios_base::binary | std::ios_base::out);
         cereal::PortableBinaryOutputArchive oarchive(outfile); // Create an output archive
         oarchive(*this);
@@ -274,21 +268,21 @@ namespace CoGaDB
     }
 
     template<class T>
-    unsigned int Column<T>::getSizeinBytes() const noexcept
+    unsigned int Column<T>::getSizeInBytes() const noexcept
     {
         return values_.capacity() * sizeof(T);
     }
 
     // total template specialization
     template<>
-    inline unsigned int Column<std::string>::getSizeinBytes() const noexcept
+    inline unsigned int Column<std::string>::getSizeInBytes() const noexcept
     {
         unsigned int size_in_bytes = 0;
         for (const auto &value : values_)
         {
             size_in_bytes += value.capacity();
         }
-        // return values_.size()*sizeof(T);
+
         return size_in_bytes;
     }
 
