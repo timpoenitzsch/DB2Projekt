@@ -2,6 +2,7 @@
 // CoGaDB includes
 #include <core/global_definitions.hpp>
 #include <memory>
+#include <vector>
 
 namespace CoGaDB
 {

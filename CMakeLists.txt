@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 cmake_policy(SET CMP0048 NEW)
-project(db2_programming_project VERSION 2.0 LANGUAGES CXX)
+project(db2_programming_project VERSION 2022 LANGUAGES CXX)
 
 #download and include cmake package manager
 set(CPM_DOWNLOAD_VERSION 0.34.0)
@@ -49,8 +49,7 @@ if (BUILD_DOC)
         configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
         message("Doxygen build started")
 
-        # note the option ALL which allows to build the docs together with the application
-        add_custom_target(documentation ALL
+        add_custom_target(documentation
                 COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
                 COMMENT "Generating API documentation with Doxygen"
@@ -74,9 +73,22 @@ include(${Catch2_SOURCE_DIR}/contrib/Catch.cmake)
 #add source
 add_subdirectory(src)
 
-#TODO: custom release command with archiving
-#rm -rf Release db2_programming_project_SoSe2015 db2_programming_project_SoSe2015.tgz
-#svn export . Release/
-#rm -rf Release/.gitignore
-#mv Release db2_programming_project_SoSe2015
-#tar -cvzf db2_programming_project_SoSe2015.tgz db2_programming_project_SoSe2015
+#add support for packaging sources for submission
+set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_SOURCE_IGNORE_FILES
+        \\.git/
+        \\.git*
+        \\.idea*
+        \\.vscode/
+        \\.mypy_cache/
+        \\.archive/
+        "build*/"
+        "build.*/"
+        "cmake.*"
+        doc/html
+        .editorconfig
+        .gdbinit
+        ".*~$"
+        )
+set(CPACK_VERBATIM_VARIABLES YES)
+include(CPack)
