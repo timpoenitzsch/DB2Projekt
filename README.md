@@ -77,7 +77,7 @@ You should familiarize yourself with the following features of the C++ language:
 - create objects on the heap with new
 - call by value and call by reference
 - public inheritance
-- basic STL containers, such as std::vector and std::list
+- basic STL containers, such as std::vector, std::list and std::map
 - basic templates and how to use them
 
 You can find a lot of useful examples in the framework code, e.g., the uncompressed column implementation @ref include/core/column.hpp.
