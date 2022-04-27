@@ -70,13 +70,17 @@ class ColumnComparator : public Catch::MatcherBase<Column> {
 
     // Performs the test for this matcher
     bool match( Column const& col) const override {
+        if (ref_data.size() != col.size()) {
+            std::cerr << "Size mismatch!" << std::endl;
+            return false;
+        }
         for (unsigned int i = 0; i < ref_data.size(); i++)
         {
             typename Column::value_type col_value = const_cast<Column &>(col)[i];
             if (ref_data[i] != col_value)
             {
-                std::cout << "Fatal Error! In Unittest: read invalid data" << std::endl;
-                std::cout << "Column: '" << col.getName() << "' TID: '" << i << "' Expected Value: '" << ref_data[i]
+                std::cerr << "Fatal Error! In Unittest: read invalid data" << std::endl;
+                std::cerr << "Column: '" << col.getName() << "' TID: '" << i << "' Expected Value: '" << ref_data[i]
                           << "' Actual Value: '" << col_value << "'" << std::endl;
                 return false;
             }

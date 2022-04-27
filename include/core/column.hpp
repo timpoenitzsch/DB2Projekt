@@ -55,7 +55,10 @@ namespace CoGaDB {
         [[nodiscard]] bool isCompressed() const noexcept final;
 
         template<class Archive>
-        [[maybe_unused]] void serialize(Archive &archive) {
+        /**
+         * @brief Serialization method called by Cereal. Implement this method in your compressed columns to get serialization working.
+         */
+        void serialize(Archive &archive) {
             archive(values_); // serialize things by passing them to the archive
         }
 
@@ -159,29 +162,6 @@ namespace CoGaDB {
     }
 
     /***************** relational operations on Columns which return lookup tables *****************/
-
-    template<class T>
-    void Column<T>::load(const std::string &path_) {
-        std::string path(path_);
-        path += "/";
-        path += this->name_;
-
-        std::ifstream infile(path.c_str(), std::ios_base::binary | std::ios_base::in);
-        cereal::PortableBinaryInputArchive ia(infile);
-        ia(*this);
-    }
-
-    template<class T>
-    void Column<T>::store(const std::string &path_) {
-        std::string path(path_);
-        path += "/";
-        path += this->name_;
-
-        std::ofstream outfile(path.c_str(), std::ios_base::binary | std::ios_base::out);
-        cereal::PortableBinaryOutputArchive oarchive(outfile); // Create an output archive
-        oarchive(*this);
-    }
-
     template<class T>
     bool Column<T>::isMaterialized() const noexcept {
         return true;
@@ -212,6 +192,27 @@ namespace CoGaDB {
     template<typename T>
     Column<T>::Column(const std::string &name) : ColumnBaseTyped<T>(name), type_tid_comparator(), values_() {
 
+    }
+
+    template<typename T>
+    void Column<T>::load(const std::string &path_) {
+        std::string path(path_);
+        path += this->name_;
+
+        std::ifstream infile(path.c_str(), std::ifstream::binary | std::ifstream::in);
+        cereal::PortableBinaryInputArchive ia(infile);
+        ia(*this);
+    }
+
+    template<typename T>
+    void Column<T>::store(const std::string &path_) {
+        std::string path(path_);
+        path += this->name_;
+
+        std::ofstream outfile(path.c_str(), std::ofstream::binary | std::ofstream::out | std::ofstream::trunc);
+        assert(outfile.is_open());
+        cereal::PortableBinaryOutputArchive oarchive(outfile); // Create an output archive
+        oarchive(*this);
     }
 
     /***************** End of Implementation Section ******************/

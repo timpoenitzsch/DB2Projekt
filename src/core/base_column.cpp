@@ -14,5 +14,4 @@ namespace CoGaDB
     {
         return name_;
     }
-
 } // namespace CoGaDB

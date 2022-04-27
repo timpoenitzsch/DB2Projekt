@@ -2,7 +2,7 @@
 #include "core/column.hpp"
 
 // TODO: include your compressed column implementations here
-//#include "compression/dictionary_compressed_column.hpp"
+#include "compression/dictionary_compressed_column.hpp"
 
 
 #include "config.hpp"
@@ -69,10 +69,9 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
 
     /****** STORE AND LOAD TEST ******/
     REQUIRE_NOTHROW(col_one.store(DATA_PATH));
-
     col_one.clearContent();
     REQUIRE(col_one.size() == 0);
 
     REQUIRE_NOTHROW(col_two.load(DATA_PATH));
-    REQUIRE_THAT(col_one, isEqual<TestType>(reference_data));
+    REQUIRE_THAT(col_two, isEqual<TestType>(reference_data));
 }

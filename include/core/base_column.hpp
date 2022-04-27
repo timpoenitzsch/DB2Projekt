@@ -130,9 +130,11 @@ namespace CoGaDB {
         /*! \brief load column from disc
          *  \details calling load on a column that is not empty yields undefined behaviour, throws if an error occurred*/
         virtual void load(const std::string &path) = 0;
+
         /*! \brief use this method to determine whether the column is materialized or a Lookup Column
          * \return true in case the column is storing the plain values (without compression) and false in case the
          * column is a LookupColumn.*/
+
         /***************** misc operations *****************/
         [[nodiscard]] virtual bool isMaterialized() const noexcept = 0;
 
