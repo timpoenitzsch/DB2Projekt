@@ -3,7 +3,7 @@ stages:
   - test
 
 build-gcc:
-  image: ubuntu:latest
+  image: ubuntu:bionic
   tags:
     - docker
   stage: build
@@ -13,19 +13,19 @@ build-gcc:
     - cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
     - cd build && cmake --build .
 
-#build-clang:
-#  image: ubuntu:latest
-#  tags:
-#    - docker
-#  stage: build
-#  script:
-#    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y clang make cmake git
-#    - mkdir build
-#    - cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=clang++
-#    - cd build && cmake --build .
+build-clang:
+  image: ubuntu:bionic
+  tags:
+    - docker
+  stage: build
+  script:
+    - apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Europe/Berlin apt-get install -y clang make cmake git
+    - mkdir build
+    - cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=clang++
+    - cd build && cmake --build .
 
 test:
-  image: ubuntu:latest
+  image: ubuntu:bionic
   tags:
     - docker
   stage: test
@@ -40,6 +40,16 @@ test:
 #  stage: build
 #  tags:
 #    - macosx
+#  script:
+#    - mkdir build
+#    - cmake -H. -Bbuild
+#    - cd build && cmake --build .
+#    - ctest --extra-verbose
+
+#windows-build:
+#  stage: build
+#  tags:
+#    - windows
 #  script:
 #    - mkdir build
 #    - cmake -H. -Bbuild
