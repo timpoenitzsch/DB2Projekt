@@ -3,7 +3,7 @@ stages:
   - test
 
 build-gcc:
-  image: ubuntu:bionic
+  image: ubuntu:focal
   tags:
     - docker
   stage: build
@@ -14,7 +14,7 @@ build-gcc:
     - cd build && cmake --build .
 
 build-clang:
-  image: ubuntu:bionic
+  image: ubuntu:focal
   tags:
     - docker
   stage: build
