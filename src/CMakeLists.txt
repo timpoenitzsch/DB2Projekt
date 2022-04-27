@@ -1,5 +1,4 @@
-add_executable(main)
-target_sources(main PRIVATE main.cpp)
+add_executable(main main.cpp)
 target_link_libraries(main Catch2 cereal)
 target_compile_options(main PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
