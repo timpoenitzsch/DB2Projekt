@@ -6,9 +6,11 @@
 
 namespace CoGaDB
 {
-
     using ColumnType = std::variant<std::monostate, int, float, std::string, bool>;
 
+    /**
+     * @brief Possible attribute types supported by the system
+     */
     enum AttributeType
     {
         INT = 1,
@@ -38,7 +40,9 @@ namespace CoGaDB
         print_time_measurement = 0
     };
 
+    /**
+     * @brief The Tuple IDentifier (TID) is the unique,numeric identifier of a tuple in a relation
+     */
     using TID = unsigned int;
-    using Attribut = std::pair<AttributeType, std::string>;
 
 } // namespace CoGaDB

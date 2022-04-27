@@ -1,6 +1,10 @@
 #define CATCH_CONFIG_MAIN
 #include "core/column.hpp"
+
 // TODO: include your compressed column implementations here
+//#include "compression/dictionary_compressed_column.hpp"
+
+
 #include "config.hpp"
 #include "tests/utils.hpp"
 
@@ -11,8 +15,8 @@ struct Column_Test_Fixture
 {
     using ValueType = typename T::value_type;
     Column_Test_Fixture() :
-        col_one(getAttributeString<ValueType>(), getAttributeType<ValueType>()),
-        col_two(getAttributeString<ValueType>(), getAttributeType<ValueType>()),
+        col_one(getAttributeString<ValueType>()),
+        col_two(getAttributeString<ValueType>()),
         reference_data(100){};
 
     T col_one;
