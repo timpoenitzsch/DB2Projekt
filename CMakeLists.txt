@@ -52,7 +52,7 @@ if (BUILD_DOC)
         add_custom_target(documentation
                 COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc
-                COMMENT "Generating API documentation with Doxygen"
+                COMMENT "Generating API documentation..."
                 VERBATIM)
     else (DOXYGEN_FOUND)
         message("Doxygen need to be installed to generate the doxygen documentation")

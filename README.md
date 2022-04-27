@@ -59,7 +59,9 @@ Therefore, you can use either the GUI frontend from CMake, open the project in a
 CMake will now check for needed features, download further dependencies and configure the project.
 
 ## Documentation
-To generate the documentation for the project, please run `cmake --build . --target documentation`
+To generate the documentation for the project, please run `cmake --build . --target documentation`.
+This generates the html documentation in the doc folder. 
+You can read the documentation by simply opening the index.htm file in the html folder with your favourite browser.
 
 ## Tests
 To run the tests, run `$ ctest .` in the build directory. This will build the project and run available tests.
