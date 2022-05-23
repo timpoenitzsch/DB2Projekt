@@ -5,12 +5,13 @@
 #include <any>
 #include <cassert>
 #include <core/base_column.hpp>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <utility>
-#include <string>
 
 
 /*! \brief The global namespace of the programming tasks, to avoid name clashes with other libraries.*/
@@ -40,6 +41,7 @@ namespace CoGaDB {
         ~ColumnBaseTyped() override = default;
 
         using ColumnBase::insert;
+
         virtual void insert(const T &new_Value) = 0;
 
         /***************** relational operations on Columns which return lookup tables *****************/
@@ -79,7 +81,7 @@ namespace CoGaDB {
          * \details Note that this method is pure virtual, so it has to be defined in a derived class.
          * \return a reference to the value at position index
          * */
-        virtual T &operator[](int index) = 0;
+        virtual T operator[](int index) = 0;
 
         inline bool operator==(const ColumnBaseTyped<T> &column) const;
 
@@ -250,7 +252,7 @@ namespace CoGaDB {
         auto value = std::get<Type>(new_value);
 
         for (unsigned int i = 0; i < this->size(); i++) {
-            this->operator[](i) += value;
+            this->update(i, this->operator[](i) + value);
         }
         return true;
     }
@@ -261,7 +263,7 @@ namespace CoGaDB {
         auto &typed_column = dynamic_cast<ColumnBaseTyped<Type> &>(column);
 
         for (unsigned int i = 0; i < this->size(); i++) {
-            this->operator[](i) += typed_column[i];
+            this->update(i, this->operator[](i) + typed_column[i]);
         }
         return true;
     }
@@ -275,7 +277,7 @@ namespace CoGaDB {
 
         auto value = std::get<Type>(new_value);
         for (unsigned int i = 0; i < this->size(); i++) {
-            this->operator[](i) -= value;
+            this->update(i, this->operator[](i) - value);
         }
         return true;
     }
@@ -286,7 +288,7 @@ namespace CoGaDB {
         auto &typed_column = reinterpret_cast<ColumnBaseTyped<Type> &>(column);
 
         for (unsigned int i = 0; i < this->size(); i++) {
-            this->operator[](i) -= typed_column[i];
+            this->update(i, this->operator[](i) - typed_column[i]);
         }
         return true;
     }
@@ -298,7 +300,8 @@ namespace CoGaDB {
 
         Type value = std::any_cast<Type>(new_value);
         for (unsigned int i = 0; i < this->size(); i++) {
-            this->operator[](i) *= value;
+            auto tmp = this->operator[](i) * value;
+            this->update(i, tmp);
         }
         return true;
     }
@@ -309,7 +312,8 @@ namespace CoGaDB {
         auto &typed_column = dynamic_cast<ColumnBaseTyped<Type> &>(column);
 
         for (unsigned int i = 0; i < this->size(); i++) {
-            this->operator[](i) *= typed_column[i];
+            auto tmp = this->operator[](i) * typed_column[i];
+            this->update(i, tmp);
         }
         return true;
     }
@@ -324,7 +328,8 @@ namespace CoGaDB {
         if (value == 0)
             return false;
         for (unsigned int i = 0; i < this->size(); i++) {
-            this->operator[](i) /= value;
+            auto val = this->operator[](i) / value;
+            this->update(i, val);
         }
         return true;
     }
@@ -335,7 +340,8 @@ namespace CoGaDB {
         auto &typed_column = reinterpret_cast<ColumnBaseTyped<Type> &>(column);
 
         for (unsigned int i = 0; i < this->size(); i++) {
-            this->operator[](i) /= typed_column[i];
+            auto val = this->operator[](i) / typed_column[i];
+            this->update(i, val);
         }
         return true;
     }

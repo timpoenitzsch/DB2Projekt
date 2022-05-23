@@ -62,7 +62,7 @@ namespace CoGaDB {
             archive(values_); // serialize things by passing them to the archive
         }
 
-        T &operator[](int index) final;
+        T operator[](int index) final;
 
         [[maybe_unused]] std::vector<T> &getContent();
 
@@ -173,7 +173,7 @@ namespace CoGaDB {
     }
 
     template<class T>
-    T &Column<T>::operator[](const int index) {
+    T Column<T>::operator[](const int index) {
         return values_[index];
     }
 
