@@ -63,8 +63,13 @@ To generate the documentation for the project, please run `cmake --build . --tar
 This generates the html documentation in the doc folder. 
 You can read the documentation by simply opening the index.htm file in the html folder with your favourite browser.
 
+## Building the Project
+In order to build the binary from your source files, you can just call the command `cmake --build . --target main`.
+
 ## Tests
-To run the tests, run `$ ctest .` in the build directory. This will build the project and run available tests.
+To run the tests, just run `$ ctest .` in the build directory, when the binary is already build. This will build the project and run available tests.
+If you want to build and run the tests in one command, you can use `$ ctest --build-and-test source_directory build_directory --build-generator generator` with generator being "Unix Makefiles", "Ninja" or "Visual Studio".
+You also have to replace source_directory with the root directory of the project and build directory with the cmake configured build path.
 
 # Getting Started
 To implement your selected compression technique, you have to inherit from the base class @ref CoGaDB::CompressedColumn and implement it's pure virtual methods (similar to an abstract method in Java).
@@ -89,6 +94,6 @@ Recommended (selected) sources of information about C++ are:
 - Scott Meyers. Effective C++: 55 Specific Ways to Improve Your Programs and Designs, Addison-Wesley, 3rd edition, 2005
 
 # Submission
-To prepare your solution for submission, it has to be packaged. You can do this with the command `$ cmake . --target package_source`.
+To prepare your solution for submission, it has to be packaged. You can do this with the command `$ cmake --build . --target package_source`.
 This generates an archive containing the entire project source code, including your implementation in the build directory.
 To submit you solution, you just have to upload the archive [here](https://elearning.ovgu.de/mod/assign/view.php?id=333676).
