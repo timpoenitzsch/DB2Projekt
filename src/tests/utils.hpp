@@ -108,24 +108,24 @@ inline ColumnComparator<Column> isEqual(std::vector<typename Column::value_type>
 template<typename ValueType>
 AttributeType getAttributeType()
 {
-    return INT;
+    return AttributeType::INT;
 }
 
 template<>
 AttributeType getAttributeType<int>()
 {
-    return INT;
+    return AttributeType::INT;
 }
 template<>
 AttributeType getAttributeType<float>()
 {
-    return FLOAT;
+    return AttributeType::FLOAT;
 }
 
 template<>
 AttributeType getAttributeType<std::string>()
 {
-    return VARCHAR;
+    return AttributeType::VARCHAR;
 }
 
 template<typename ValueType>

@@ -11,7 +11,7 @@ namespace CoGaDB
     /**
      * @brief Possible attribute types supported by the system
      */
-    enum AttributeType
+    enum class AttributeType
     {
         INT = 1,
         FLOAT,

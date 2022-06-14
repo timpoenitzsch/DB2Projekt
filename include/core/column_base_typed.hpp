@@ -390,13 +390,13 @@ namespace CoGaDB {
     template<class T>
     AttributeType ColumnBaseTyped<T>::getType() const {
         if constexpr(std::is_same_v<value_type, int>)
-            return INT;
+            return AttributeType::INT;
         if constexpr(std::is_same_v<value_type, float>)
-            return FLOAT;
+            return AttributeType::FLOAT;
         if constexpr(std::is_same_v<value_type, bool>)
-            return BOOLEAN;
+            return AttributeType::BOOLEAN;
         if constexpr(std::is_same_v<value_type, std::string>)
-            return VARCHAR;
+            return AttributeType::VARCHAR;
         else
             throw;
     }
