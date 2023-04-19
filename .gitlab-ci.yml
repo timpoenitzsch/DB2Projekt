@@ -3,7 +3,7 @@ stages:
   - test
 
 build-gcc:
-  image: ubuntu:focal
+  image: ubuntu:20.04
   tags:
     - docker
   stage: build
@@ -14,7 +14,7 @@ build-gcc:
     - cd build && cmake --build .
 
 build-clang:
-  image: ubuntu:focal
+  image: ubuntu:20.04
   tags:
     - docker
   stage: build
@@ -25,7 +25,7 @@ build-clang:
     - cd build && cmake --build .
 
 test:
-  image: ubuntu:focal
+  image: ubuntu:20.04
   tags:
     - docker
   stage: test
