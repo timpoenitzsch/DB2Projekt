@@ -1,8 +1,8 @@
-DB2 Programming Task SoSe2022                         {#mainpage}
+DB2 Programming Task SoSe2023                        {#mainpage}
 ============
 
 # Introduction
-This is the documentation of the programming project for the exercises in the Lecture 'Databases Implementation Techniques' (DB2) in summer term 2022.
+This is the documentation of the programming project for the exercises in the Lecture 'Databases Implementation Techniques' (DB2) in summer term 2023.
 You can find general information about the lecture [here](https://www.dbse.ovgu.de/Lehre/Sommersemester/Bachelor+und+Master/DB2.html).
 
 # Tasks

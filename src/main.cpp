@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include "core/column.hpp"
 
 // TODO: include your compressed column implementations here
@@ -8,7 +7,8 @@
 #include "config.hpp"
 #include "tests/utils.hpp"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_template_test_macros.hpp>
 
 template<typename T>
 struct Column_Test_Fixture

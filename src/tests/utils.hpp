@@ -7,14 +7,14 @@
 
 #pragma once
 
+#include <catch2/matchers/catch_matchers.hpp>
+#include <compression/compressed_column.hpp>
 #include <core/base_column.hpp>
 #include <core/column.hpp>
 #include <core/column_base_typed.hpp>
-#include <compression/compressed_column.hpp>
 #include <core/global_definitions.hpp>
 #include <random>
 #include <string>
-#include "catch2/catch.hpp"
 
 using namespace CoGaDB;
 
@@ -63,7 +63,7 @@ void fill_column(ColumnBaseTyped<T> &col, std::vector<T> &reference_data)
 }
 
 template<class Column>
-class ColumnComparator : public Catch::MatcherBase<Column> {
+class ColumnComparator : public Catch::Matchers::MatcherBase<Column> {
     std::vector<typename Column::value_type> ref_data;
   public:
     explicit ColumnComparator(decltype(ref_data) &reference_data) : ref_data(reference_data) {}

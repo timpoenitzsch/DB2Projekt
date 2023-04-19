@@ -4,7 +4,7 @@ cmake_policy(SET CMP0076 NEW)
 project(db2_programming_project VERSION 2022 LANGUAGES CXX)
 
 #download and include cmake package manager
-set(CPM_DOWNLOAD_VERSION 0.34.0)
+set(CPM_DOWNLOAD_VERSION 0.38.1)
 
 if(CPM_SOURCE_CACHE)
     set(CPM_DOWNLOAD_LOCATION "${CPM_SOURCE_CACHE}/cpm/CPM_${CPM_DOWNLOAD_VERSION}.cmake")
@@ -27,7 +27,7 @@ include(${CPM_DOWNLOAD_LOCATION})
 #add dependencies through cmake package manager
 
 #unittests
-CPMAddPackage("gh:catchorg/Catch2@2.13.8")
+CPMAddPackage("gh:catchorg/Catch2@3.3.2")
 
 #serialization
 CPMAddPackage(
@@ -69,7 +69,6 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 #enable support for testing with catch in cmake
 enable_testing()
 include(CTest)
-include(${Catch2_SOURCE_DIR}/contrib/Catch.cmake)
 
 #add source
 add_subdirectory(src)
