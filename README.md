@@ -23,14 +23,14 @@ You may choose between the following compression techniques (you may suggest oth
 - Dictionary Encoding
 - Frequency Partitioning
 
-All compression techniques are explained in the lecture. You can find the slides [here](https://elearning.ovgu.de/course/view.php?id=12434#section-5).
+All compression techniques are explained in the lecture. You can find the slides [here](https://elearning.ovgu.de/course/view.php?id=12434#section-6).
 
 # Organization
 
 Students will form teams of two students each. In case the exercise has an uneven number of participants, one team may consist of three students.
-Please register your team until the **12.05.2022** via [Moodle](https://elearning.ovgu.de/mod/choicegroup/view.php?id=333678).
+Please register your team until the **08.05.2023** via [Moodle](https://elearning.ovgu.de/mod/choicegroup/view.php?id=416630).
 
-Solutions are to be submitted via [Moodle](https://elearning.ovgu.de/mod/assign/view.php?id=333676) until the **6.07.2022 23:39**.
+Solutions are to be submitted via [Moodle](https://elearning.ovgu.de/mod/assign/view.php?id=416631) until the **5.07.2023 23:39**.
 Note that the deadline is strict, there will be **no** deadline extension.
 
 Solutions will be presented and discussed by each team in the exercise.
@@ -96,4 +96,4 @@ Recommended (selected) sources of information about C++ are:
 # Submission
 To prepare your solution for submission, it has to be packaged. You can do this with the command `$ cmake --build . --target package_source`.
 This generates an archive containing the entire project source code, including your implementation in the build directory.
-To submit you solution, you just have to upload the archive [here](https://elearning.ovgu.de/mod/assign/view.php?id=333676).
+To submit you solution, you just have to upload the archive [here](https://elearning.ovgu.de/mod/assign/view.php?id=416631).
