@@ -1,23 +1,25 @@
-#include "core/column.hpp"
+#include "config.hpp"                           // for DATA_PATH
+#include "core/column.hpp"                      // for Column
+#include "core/global_definitions.hpp"          // for CoGaDB, TID
+#include "tests/utils.hpp"                      // for isEqual, gen, getAt...
+#include <catch2/catch_template_test_macros.hpp>// for TEMPLATE_PRODUCT_TE...
+#include <catch2/catch_test_macros.hpp>         // for operator""_catch_sr
+#include <catch2/matchers/catch_matchers.hpp>   // for REQUIRE_THAT
+#include <memory>                               // for unique_ptr
+#include <random>                               // for uniform_int_distrib...
+#include <string>                               // for string
+#include <vector>                               // for vector
 
-// TODO: include your compressed column implementations here
-#include "compression/dictionary_compressed_column.hpp"
-
-
-#include "config.hpp"
-#include "tests/utils.hpp"
-
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/catch_template_test_macros.hpp>
+namespace CoGaDB {
+    class ColumnBase;
+}
 
 template<typename T>
-struct Column_Test_Fixture
-{
+struct Column_Test_Fixture {
     using ValueType = typename T::value_type;
-    Column_Test_Fixture() :
-        col_one(getAttributeString<ValueType>()),
-        col_two(getAttributeString<ValueType>()),
-        reference_data(100){};
+    Column_Test_Fixture() : col_one(getAttributeString<ValueType>()),
+                            col_two(getAttributeString<ValueType>()),
+                            reference_data(100){};
 
     T col_one;
     T col_two;
@@ -30,8 +32,7 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
                                   "Template test case method with test types specified inside std::tuple",
                                   "[class][template]",
                                   (Column /*TODO: insert your column types here, separated by comma*/),
-                                  (int, float, std::string))
-{
+                                  (int, float, std::string)) {
     using ValueType = typename Column_Test_Fixture<TestType>::ValueType;
     auto &col_one = Column_Test_Fixture<TestType>::col_one;
     auto &col_two = Column_Test_Fixture<TestType>::col_two;

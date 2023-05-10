@@ -1,8 +1,12 @@
 #pragma once
 // CoGaDB includes
-#include <core/global_definitions.hpp>
-#include <memory>
-#include <vector>
+#include <cstddef>                     // for size_t
+#include <core/global_definitions.hpp>  // for ColumnType, TID, SortOrder
+#include <iosfwd>                       // for ostream
+#include <memory>                       // for unique_ptr
+#include <string>                       // for string, operator<<
+#include <utility>                      // for pair
+#include <vector>                       // for vector
 
 namespace CoGaDB {
     /* \brief a PositionList is an STL vector of TID values*/

@@ -1,7 +1,5 @@
 #include <core/base_column.hpp>
-#include <core/column.hpp>
-#include <iostream>
-#include <utility>
+#include <utility>  // for move
 
 namespace CoGaDB
 {
