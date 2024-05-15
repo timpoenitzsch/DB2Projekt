@@ -1,6 +1,7 @@
 #pragma once
 
-#include <core/column_base_typed.hpp>
+#include <core/column_base.hpp>
+#include <experimental/propagate_const>
 
 namespace CoGaDB
 {
@@ -14,35 +15,22 @@ namespace CoGaDB
      * implemented in a derived class. \author    Sebastian Breß \version   0.2 \date      2013 \copyright GNU LESSER
      * GENERAL PUBLIC LICENSE - Version 3, http://www.gnu.org/licenses/lgpl-3.0.txt
      */
-    template<class T>
-    class CompressedColumn : public ColumnBaseTyped<T>
+    template<template <typename> class Impl, class T>
+    class CompressedColumn : public ColumnBase<Impl, T>
     {
       public:
         /***************** constructors and destructor *****************/
-        //inherit constructor
-        using ColumnBaseTyped<T>::ColumnBaseTyped;
+          explicit CompressedColumn(std::string name) : ColumnBase<Impl,T>(std::move(name)) {}
 
-        ~CompressedColumn() override = default;
 
-        [[nodiscard]] virtual bool isMaterialized() const noexcept final;
+        [[nodiscard]] bool isMaterialized_impl() const noexcept
+        {
+            return false;
+        }
 
-        [[nodiscard]] virtual bool isCompressed() const noexcept final;
+        [[nodiscard]] bool isCompressed_impl() const noexcept
+        {
+            return true;
+        }
     };
-
-    /***************** Start of Implementation Section ******************/
-
-    template<class T>
-    bool CompressedColumn<T>::isMaterialized() const noexcept
-    {
-        return false;
-    }
-
-    template<class T>
-    bool CompressedColumn<T>::isCompressed() const noexcept
-    {
-        return true;
-    }
-
-    /***************** End of Implementation Section ******************/
-
 } // namespace CoGaDB
