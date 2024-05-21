@@ -23,14 +23,14 @@ You may choose between the following compression techniques (you may suggest oth
 - Dictionary Encoding
 - Frequency Partitioning
 
-All compression techniques are explained in the lecture. You can find the slides [here](https://elearning.ovgu.de/course/view.php?id=12434#section-6).
+All compression techniques are explained in the lecture. You can find the slides [here](https://elearning.ovgu.de/course/view.php?id=16383#coursecontentcollapse6).
 
 # Organization
 
 Students will form teams of two students each. In case the exercise has an uneven number of participants, one team may consist of three students.
-Please register your team until the **20.05.2024** via [Moodle](https://elearning.ovgu.de/mod/choicegroup/view.php?id=416630).
+Please register your team until the **20.05.2024** via [Moodle](https://elearning.ovgu.de/mod/choicegroup/view.php?id=488994).
 
-Solutions are to be submitted via [Moodle](https://elearning.ovgu.de/mod/assign/view.php?id=416631) until the **7.07.2024 23:39**.
+Solutions are to be submitted via [Moodle](https://elearning.ovgu.de/mod/assign/view.php?id=488995) until the **7.07.2024 23:39**.
 Note that the deadline is strict, there will be **no** deadline extension.
 
 Solutions will be presented and discussed by each team in the exercise.
