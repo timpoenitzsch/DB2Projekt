@@ -1,8 +1,8 @@
-DB2 Programming Task SoSe2023                        {#mainpage}
+DB2 Programming Task SoSe2024                        {#mainpage}
 ============
 
 # Introduction
-This is the documentation of the programming project for the exercises in the Lecture 'Databases Implementation Techniques' (DB2) in summer term 2023.
+This is the documentation of the programming project for the exercises in the Lecture 'Databases Implementation Techniques' (DB2) in summer term 2024.
 You can find general information about the lecture [here](https://www.dbse.ovgu.de/Lehre/Sommersemester/Bachelor+und+Master/DB2.html).
 
 # Tasks
@@ -28,9 +28,9 @@ All compression techniques are explained in the lecture. You can find the slides
 # Organization
 
 Students will form teams of two students each. In case the exercise has an uneven number of participants, one team may consist of three students.
-Please register your team until the **08.05.2023** via [Moodle](https://elearning.ovgu.de/mod/choicegroup/view.php?id=416630).
+Please register your team until the **20.05.2024** via [Moodle](https://elearning.ovgu.de/mod/choicegroup/view.php?id=416630).
 
-Solutions are to be submitted via [Moodle](https://elearning.ovgu.de/mod/assign/view.php?id=416631) until the **5.07.2023 23:39**.
+Solutions are to be submitted via [Moodle](https://elearning.ovgu.de/mod/assign/view.php?id=416631) until the **7.07.2024 23:39**.
 Note that the deadline is strict, there will be **no** deadline extension.
 
 Solutions will be presented and discussed by each team in the exercise.
@@ -47,7 +47,7 @@ Solutions who fail to fulfill only one of these requirements will not be able to
 As for every project, there are some points to mention on how to successfully build the project and how to get started.
 
 ## Prerequisites
-- C++ compiler with C++17 support (gcc >= 8 clang >= 8 msvc >= 2017.3.5)
+- C++ compiler with C++20 support (gcc >= 10 clang >= 10 msvc >= 19.30)
 - CMake
 - Make, Ninja or another build management tool
 - Git to download further dependencies
@@ -59,31 +59,37 @@ Therefore, you can use either the GUI frontend from CMake, open the project in a
 CMake will now check for needed features, download further dependencies and configure the project.
 
 ## Documentation
-To generate the documentation for the project, please run `cmake --build . --target documentation`.
-This generates the html documentation in the doc folder. 
+To generate the documentation for the project, please run `cmake --build . --target documentation` in the previously generated `build` folder.
+This generates the html documentation in the `doc` folder. 
 You can read the documentation by simply opening the index.htm file in the html folder with your favourite browser.
 
 ## Building the Project
-In order to build the binary from your source files, you can just call the command `cmake --build . --target main`.
+In order to build the binary from your source files, you can just call the command `cmake --build . --target main` from within the `build` folder.
 
 ## Tests
 To run the tests, just run `$ ctest .` in the build directory, when the binary is already build. This will build the project and run available tests.
 If you want to build and run the tests in one command, you can use `$ ctest --build-and-test source_directory build_directory --build-generator generator` with generator being "Unix Makefiles", "Ninja" or "Visual Studio".
 You also have to replace source_directory with the root directory of the project and build directory with the cmake configured build path.
 
-# Getting Started
-To implement your selected compression technique, you have to inherit from the base class @ref CoGaDB::CompressedColumn and implement it's pure virtual methods (similar to an abstract method in Java).
-You can test your class by adding it to the list of column types to test in @ref main.cpp. The tests are now automatically instantiated for this class and use its implemented functionality.
+# Getting Started 
+To implement your selected compression technique, you have to inherit your class from the @ref CoGaDB::CompressedColumn class, 
+passing your class name, as well as the template type as template parameters to the base class. 
+Afterwards, you implement the hidden interface functions used in the base class @ref CoGaDB::ColumnBase (all functions with _impl).
+In contrary to virtual inheritance, there are no methods you have to override, 
+instead all your functions just have to match the signature that is called in the corresponding interface methods (methods without _impl) 
+implemented in @ref CoGaDB::ColumnBase. The functionality is also specified by the @ref IColumn concept.
+You can test your class by adding it to the list of column types to test in @ref main.cpp, as well as including its header in the @ref main.cpp. 
+The tests are now automatically instantiated for this class and use its implemented functionality.
 
 If you need an example for the structure of a compressed column, we prepared an example in the project.
-The @ref CoGaDB::DictionaryCompressedColumn, which is stored in the file @ref dictionary_compressed_column.hpp.
+The @ref CoGaDB::DictionaryCompressedColumn, which is stored in the file @ref dictionary_compressed_column.hpp, shows the stubs of all methods that have to be implemented.
 
 # C++ Background
 You should familiarize yourself with the following features of the C++ language:
 - pointers, references, and [smart pointers](https://en.cppreference.com/w/cpp/memory).
 - create objects on the heap with new
 - call by value and call by reference
-- public inheritance
+- public inheritance and CRTP (static polymorphism)
 - basic STL containers, such as std::vector, std::list and std::map
 - basic templates and how to use them
 
@@ -96,4 +102,4 @@ Recommended (selected) sources of information about C++ are:
 # Submission
 To prepare your solution for submission, it has to be packaged. You can do this with the command `$ cmake --build . --target package_source`.
 This generates an archive containing the entire project source code, including your implementation in the build directory.
-To submit you solution, you just have to upload the archive [here](https://elearning.ovgu.de/mod/assign/view.php?id=416631).
+To submit you solution, you just have to upload the archive [here](https://elearning.ovgu.de/mod/assign/view.php?id=488995).

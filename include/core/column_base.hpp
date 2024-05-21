@@ -42,7 +42,7 @@ namespace CoGaDB {
         const AttributeType attribute_type = ValueAttributeTypeMapper<value_type>().attribute_type;
         /***************** constructors and destructor *****************/
         //inherit constructor
-        explicit ColumnBase(std::string name): name_(std::move(name)) {}
+        explicit ColumnBase(std::string name) requires IColumn<Derived, value_type>: name_(std::move(name)) { }
 
         /*! \brief returns database type of column (as defined in "SQL" statement)*/
         [[nodiscard]] AttributeType getType() const {
@@ -64,23 +64,23 @@ namespace CoGaDB {
         void insert(const value_type &new_Value) { self().insert_impl(new_Value); }
 
 
-        template<std::input_iterator InputIterator>
-        void insert(InputIterator  first, InputIterator  last) {
+        template<std::input_iterator InputIterator, std::sentinel_for<InputIterator> Sentinel>
+        void insert(InputIterator first, Sentinel last) {
             self().insert_impl(first, last);
         }
 
         /*! \brief updates the value on position tid with a value new_Value, throws if an error occurs */
-        void update(TID tid, const ColumnType &new_Value) { self().update_impl(tid, new_Value); }
+        void update(const TID tid, const ColumnType &new_Value) { self().update_impl(tid, new_Value); }
 
         /*! \brief updates the values specified by the position list with a value new_Value , throws if an error occurs*/
-        void update(PositionList &tids, const ColumnType &new_value) { self().update_impl(tids, new_value); }
+        void update(const PositionList &tids, const ColumnType &new_value) { self().update_impl(tids, new_value); }
 
         /*! \brief deletes the value on position tid, throws if an error occurs*/
-        void remove(TID tid) { self().remove_impl(tid); }
+        void remove(const TID tid) { self().remove_impl(tid); }
 
         /*! \brief deletes the values defined in the position list
          *  \details assumes tid list is sorted ascending, throws if an error occurs*/
-        void remove(PositionList &tids) { self().remove_impl(tids); }
+        void remove(const PositionList &tids) { self().remove_impl(tids); }
 
         /*! \brief deletes all values stored in the column throws am exception if an error occurs */
         void clearContent() { self().clearContent_impl(); }
@@ -88,8 +88,8 @@ namespace CoGaDB {
         /*! \brief generic function for fetching a value form a column (slow)
          *  \details check whether the object is valid (e.g., when a tid is not valid, then the returned object is
          * invalid as well) \return object of type ColumnType containing the value on position tid. If tid is not valid, throws exception. */
-        [[nodiscard]] ColumnType get(TID tid) { return self().get_impl(tid); } // not const, because operator [] does not provide const return type
-        [[nodiscard]] ColumnType get(TID tid) const { return self().get_impl(tid); } // not const, because operator [] does not provide const return type
+        [[nodiscard]] ColumnType get(const TID tid) { return self().get_impl(tid); } // not const, because operator [] does not provide const return type
+        [[nodiscard]] ColumnType get(const TID tid) const { return self().get_impl(tid); } // not const, because operator [] does not provide const return type
         // and the child classes rely on []
         /*! \brief creates a textual representation of the content of the column */
         [[nodiscard]] std::string print() noexcept { return self().print_impl(); }

@@ -17,20 +17,20 @@ namespace CoGaDB {
     }
 
     template<IColumnType T>
-    template<std::input_iterator InputIterator>
-    void Column<T>::insert_impl(InputIterator first, InputIterator last) {
+    template<std::input_iterator InputIterator, std::sentinel_for<InputIterator> Sentinel>
+    void Column<T>::insert_impl(const InputIterator &first, const Sentinel &last) {
         this->values_.insert(this->values_.end(), first, last);
     }
 
     template<IColumnType T>
-    void Column<T>::update_impl(TID tid, const ColumnType &new_value) {
+    void Column<T>::update_impl(const TID tid, const ColumnType &new_value) {
         //will throw if new_value doesn't hold type T
         auto value = std::get<value_type>(new_value);
         values_[tid] = value;
     }
 
     template<IColumnType T>
-    void Column<T>::update_impl(PositionList &tids, const ColumnType &new_value) {
+    void Column<T>::update_impl(const PositionList &tids, const ColumnType &new_value) {
         //will throw if new_value doesn't hold type T
         T value = std::get<T>(new_value);
         for (auto tid: tids) {
@@ -39,13 +39,13 @@ namespace CoGaDB {
     }
 
     template<IColumnType T>
-    void Column<T>::remove_impl(TID tid) {
+    void Column<T>::remove_impl(const TID tid) {
         values_.erase(values_.begin() + tid);
     }
 
     template<IColumnType T>
-    void Column<T>::remove_impl(PositionList &tids) {
-        for (unsigned long &tid: std::ranges::reverse_view(tids))
+    void Column<T>::remove_impl(const PositionList &tids) {
+        for (const unsigned long &tid: std::ranges::reverse_view(tids))
             values_.erase(values_.begin() + tid);
     }
 
@@ -55,12 +55,12 @@ namespace CoGaDB {
     }
 
     template<IColumnType T>
-    ColumnType Column<T>::get_impl(TID tid) {
+    ColumnType Column<T>::get_impl(const TID tid) {
         return values_.at(tid);
     }
 
     template<IColumnType T>
-    ColumnType Column<T>::get_impl(TID tid) const {
+    ColumnType Column<T>::get_impl(const TID tid) const {
         return values_.at(tid);
     }
 

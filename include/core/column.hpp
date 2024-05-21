@@ -21,15 +21,15 @@ namespace CoGaDB {
 
         void insert_impl(const ColumnType &new_value);
         void insert_impl(const value_type &new_value);
-        template<std::input_iterator InputIterator>
-        void insert_impl(InputIterator first, InputIterator last);
+        template<std::input_iterator InputIterator, std::sentinel_for<InputIterator> Sentinel>
+        void insert_impl(const InputIterator &first, const Sentinel &last);
 
         void update_impl(TID tid, const ColumnType &new_value);
-        void update_impl(PositionList &tids, const ColumnType &new_value);
+        void update_impl(const PositionList &tids, const ColumnType &new_value);
 
         void remove_impl(TID tid);
         // assumes tid list is sorted ascending
-        void remove_impl(PositionList &tids);
+        void remove_impl(const PositionList &tids);
 
         void clearContent_impl();
 

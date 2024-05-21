@@ -16,7 +16,7 @@ namespace CoGaDB {
      * compressed typed column classes.
      */
     template<class T>
-    class DictionaryCompressedColumn final : public CompressedColumn<DictionaryCompressedColumn, T> {
+    class DictionaryCompressedColumn : public CompressedColumn<DictionaryCompressedColumn, T> {
     public:
         using value_type = T;
         /***************** constructors and destructor *****************/
@@ -31,8 +31,8 @@ namespace CoGaDB {
             /* TODO: implement */
         }
 
-        template<std::input_iterator InputIterator>
-        void insert_impl(InputIterator first, InputIterator last) {
+        template<std::input_iterator InputIterator, std::sentinel_for<InputIterator> Sentinel>
+        void insert_impl(const InputIterator &first, const Sentinel &last) {
             /* TODO: implement */
         }
 
@@ -40,7 +40,7 @@ namespace CoGaDB {
             /* TODO: implement */
         }
 
-        void update_impl(PositionList &tids, const ColumnType &new_value) {
+        void update_impl(const PositionList &tids, const ColumnType &new_value) {
             /* TODO: implement */
         }
 
@@ -49,7 +49,7 @@ namespace CoGaDB {
         }
 
         // assumes tid list is sorted ascending
-        void remove_impl(PositionList &tids) {
+        void remove_impl(const PositionList &tids) {
             /* TODO: implement */
         }
 

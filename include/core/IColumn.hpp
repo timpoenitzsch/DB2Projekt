@@ -1,7 +1,7 @@
 #pragma once
-#include <type_traits>
-#include <concepts>
 #include "global_definitions.hpp"
+#include <concepts>
+#include <type_traits>
 
 namespace CoGaDB {
 
@@ -10,7 +10,7 @@ namespace CoGaDB {
         { c.insert_impl(ColumnType()) };
         { c.insert_impl(T()) };
         { c.update_impl(TID(), ColumnType()) };
-        { c.insert_impl(std::input_iterator<T>, std::input_iterator<T>) };
+        { c.insert_impl(std::vector<T>{}.begin(), std::vector<T>{}.end()) };
         { c.update_impl(PositionList(), ColumnType()) };
         { c.remove_impl(TID()) };
         { c.remove_impl(PositionList()) };
@@ -22,11 +22,10 @@ namespace CoGaDB {
         { c.getSizeInBytes_impl() } -> std::same_as<std::size_t>;
         { c.isMaterialized_impl() } -> std::convertible_to<bool>;
         { c.isCompressed_impl() } -> std::convertible_to<bool>;
-        { c.getName_impl() } -> std::same_as<std::string>;
         { c.getType() } -> std::same_as<AttributeType>;
-        { c==c } -> std::convertible_to<bool>;
+        { c == c } -> std::convertible_to<bool>;
 
         // operator<<?
     };
 
-}
+}// namespace CoGaDB
