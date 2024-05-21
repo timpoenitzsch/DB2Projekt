@@ -1,1 +1,0 @@
-target_sources(main PRIVATE base_column.cpp)

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0076 NEW)
-project(db2_programming_project VERSION 2022 LANGUAGES CXX)
+project(db2_programming_project VERSION 2024 LANGUAGES CXX)
 
 #download and include cmake package manager
 set(CPM_DOWNLOAD_VERSION 0.38.1)
@@ -27,7 +27,7 @@ include(${CPM_DOWNLOAD_LOCATION})
 #add dependencies through cmake package manager
 
 #unittests
-CPMAddPackage("gh:catchorg/Catch2@3.3.2")
+CPMAddPackage("gh:catchorg/Catch2@3.6.0")
 
 #serialization
 CPMAddPackage(

@@ -16,155 +16,82 @@ namespace CoGaDB {
      * compressed typed column classes.
      */
     template<class T>
-    class DictionaryCompressedColumn final : public CompressedColumn<T> {
+    class DictionaryCompressedColumn : public CompressedColumn<DictionaryCompressedColumn, T> {
     public:
+        using value_type = T;
         /***************** constructors and destructor *****************/
-        explicit DictionaryCompressedColumn(const std::string &name);
+        explicit DictionaryCompressedColumn(std::string name) : CompressedColumn<DictionaryCompressedColumn, T>(std::move(name)) /*TODO: instantiate your attributes here*/ {}
 
-        ~DictionaryCompressedColumn() final;
 
-        void insert(const ColumnType &new_Value) final;
+        void insert_impl(const ColumnType &new_value) {
+            /* TODO: implement */
+        }
 
-        void insert(const T &new_value) final;
+        void insert_impl(const value_type &new_value) {
+            /* TODO: implement */
+        }
 
-        template<typename InputIterator>
-        void insert(InputIterator first, InputIterator last);
+        template<std::input_iterator InputIterator, std::sentinel_for<InputIterator> Sentinel>
+        void insert_impl(const InputIterator &first, const Sentinel &last) {
+            /* TODO: implement */
+        }
 
-        void update(TID tid, const ColumnType &new_value) final;
+        void update_impl(TID tid, const ColumnType &new_value) {
+            /* TODO: implement */
+        }
 
-        void update(PositionList &tid, const ColumnType &new_value) final;
+        void update_impl(const PositionList &tids, const ColumnType &new_value) {
+            /* TODO: implement */
+        }
 
-        void remove(TID tid) final;
+        void remove_impl(TID tid) {
+            /* TODO: implement */
+        }
 
         // assumes tid list is sorted ascending
-        void remove(PositionList &tid) final;
+        void remove_impl(const PositionList &tids) {
+            /* TODO: implement */
+        }
 
-        void clearContent() final;
+        void clearContent_impl() {
+            /* TODO: implement */
+        }
 
-        ColumnType get(TID tid) final;
+        ColumnType get_impl(TID tid) {
+            /* TODO: implement */
+        }
 
-        // virtual const std::any* const getRawData()=0;
-        std::string print() const noexcept final;
+        [[nodiscard]] ColumnType get_impl(TID tid) const {
+            /* TODO: implement */
+        }
 
-        [[nodiscard]] size_t size() const noexcept final;
+        [[nodiscard]] std::string print_impl() const noexcept {
+            /* TODO: implement */
+        }
 
-        [[nodiscard]] size_t getSizeInBytes() const noexcept final;
+        [[nodiscard]] size_t size_impl() const noexcept {
+            /* TODO: implement */
+        }
 
-        [[nodiscard]] virtual std::unique_ptr<ColumnBase> copy() const;
+        [[nodiscard]] size_t getSizeInBytes_impl() const noexcept {
+            /* TODO: implement */
+        }
 
-        void store(const std::string &path) final;
-        void load(const std::string &path) final;
-
-        T operator[](int index) final;
+        [[nodiscard]] std::unique_ptr<DictionaryCompressedColumn> copy_impl() const {
+            /* TODO: implement */
+        }
 
         /**
          * @brief Serialization method called by Cereal. Implement this method in your compressed columns to get serialization working.
          */
         template<class Archive>
         void serialize(Archive &archive) {
-            //TODO: implement
-            archive();// serialize things by passing them to the archive
+            //archive();// serialize things by passing them to the archive
         }
+
+    private:
+
+        /* TODO: define your attributes and helper functions here */
     };
-
-    /***************** Start of Implementation Section ******************/
-
-    template<class T>
-    DictionaryCompressedColumn<T>::DictionaryCompressedColumn(const std::string &name) : CompressedColumn<T>(name) {
-        //TODO: implement
-    }
-
-    template<class T>
-    DictionaryCompressedColumn<T>::~DictionaryCompressedColumn() = default;
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::insert(const ColumnType &) {
-        //TODO: implement
-    }
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::insert(const T &) {
-        //TODO: implement
-    }
-
-    template<typename T>
-    template<typename InputIterator>
-    void DictionaryCompressedColumn<T>::insert(InputIterator, InputIterator) {
-        //TODO: implement
-    }
-
-    template<class T>
-    ColumnType DictionaryCompressedColumn<T>::get(TID) {
-        //TODO: implement
-        return {};
-    }
-
-    template<class T>
-    std::string DictionaryCompressedColumn<T>::print() const noexcept {
-        //TODO: implement
-        return {};
-    }
-
-    template<class T>
-    size_t DictionaryCompressedColumn<T>::size() const noexcept {
-        //TODO: implement
-        return 0;
-    }
-
-    template<class T>
-    std::unique_ptr<ColumnBase> DictionaryCompressedColumn<T>::copy() const {
-        //TODO: implement
-        return {};
-    }
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::update(TID, const ColumnType &) {
-        //TODO: implement
-    }
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::update(PositionList &, const ColumnType &) {
-        //TODO: implement
-    }
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::remove(TID) {
-        //TODO: implement
-    }
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::remove(PositionList &) {
-        //TODO: implement
-    }
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::clearContent() {
-        //TODO: implement
-    }
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::store(const std::string &) {
-        //TODO: implement
-    }
-
-    template<class T>
-    void DictionaryCompressedColumn<T>::load(const std::string &) {
-        //TODO: implement
-    }
-
-
-    template<class T>
-    T DictionaryCompressedColumn<T>::operator[](const int) {
-        //TODO: implement
-        return {};
-    }
-
-    template<class T>
-    size_t DictionaryCompressedColumn<T>::getSizeInBytes() const noexcept {
-        //TODO: implement
-        return 0;
-    }
-
-    /***************** End of Implementation Section ******************/
 
 }// namespace CoGaDB
