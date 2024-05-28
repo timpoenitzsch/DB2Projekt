@@ -8,6 +8,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -29,20 +30,22 @@ namespace CoGaDB {
      * LESSER GENERAL PUBLIC LICENSE - Version 3, http://www.gnu.org/licenses/lgpl-3.0.txt
      */
 
-    template<template <typename> class D, IColumnType T>
+    template<template<typename> class D, IColumnType T>
     class ColumnBase {
 
         using Derived = D<T>;
         std::string name_;
         constexpr Derived &self() { return *static_cast<Derived *>(this); }
-        constexpr const Derived &self() const { return *static_cast<const Derived * const >(this); }
+        constexpr const Derived &self() const { return *static_cast<const Derived *const>(this); }
 
     public:
         using value_type = T;
         const AttributeType attribute_type = ValueAttributeTypeMapper<value_type>().attribute_type;
         /***************** constructors and destructor *****************/
         //inherit constructor
-        explicit ColumnBase(std::string name) requires IColumn<Derived, value_type>: name_(std::move(name)) { }
+        explicit ColumnBase(std::string name)
+            requires IColumn<Derived, value_type>
+            : name_(std::move(name)) {}
 
         /*! \brief returns database type of column (as defined in "SQL" statement)*/
         [[nodiscard]] AttributeType getType() const {
@@ -59,7 +62,7 @@ namespace CoGaDB {
          * \return true in case the column is storing the compressed values and false otherwise.*/
         [[nodiscard]] bool isCompressed() const noexcept { return self().isCompressed_impl(); };
 
-                /***************** methods *****************/
+        /***************** methods *****************/
         void insert(const ColumnType &new_Value) { self().insert_impl(new_Value); }
         void insert(const value_type &new_Value) { self().insert_impl(new_Value); }
 
@@ -88,8 +91,8 @@ namespace CoGaDB {
         /*! \brief generic function for fetching a value form a column (slow)
          *  \details check whether the object is valid (e.g., when a tid is not valid, then the returned object is
          * invalid as well) \return object of type ColumnType containing the value on position tid. If tid is not valid, throws exception. */
-        [[nodiscard]] ColumnType get(const TID tid) { return self().get_impl(tid); } // not const, because operator [] does not provide const return type
-        [[nodiscard]] ColumnType get(const TID tid) const { return self().get_impl(tid); } // not const, because operator [] does not provide const return type
+        [[nodiscard]] ColumnType get(const TID tid) { return self().get_impl(tid); }      // not const, because operator [] does not provide const return type
+        [[nodiscard]] ColumnType get(const TID tid) const { return self().get_impl(tid); }// not const, because operator [] does not provide const return type
         // and the child classes rely on []
         /*! \brief creates a textual representation of the content of the column */
         [[nodiscard]] std::string print() noexcept { return self().print_impl(); }
@@ -110,29 +113,29 @@ namespace CoGaDB {
         [[maybe_unused]] PositionList selection(const ColumnType &value_for_comparison, ValueComparator comp);
 
         [[maybe_unused]] PositionList parallel_selection(const ColumnType &,
-                                        ValueComparator,
-                                        unsigned int);
+                                                         ValueComparator,
+                                                         unsigned int);
 
         // join algorithms
         template<IColumn<T> C>
-        [[maybe_unused]]  PositionListPair hash_join(C &join_column);
+        [[maybe_unused]] PositionListPair hash_join(C &join_column);
 
         template<IColumn<T> C>
-        [[maybe_unused]]  PositionListPair sort_merge_join(C &join_column);
+        [[maybe_unused]] PositionListPair sort_merge_join(C &join_column);
 
         template<IColumn<T> C>
-        [[maybe_unused]]  PositionListPair nested_loop_join(C join_column);
+        [[maybe_unused]] PositionListPair nested_loop_join(C join_column);
 
         bool add(const ColumnType &new_value);
         // vector addition between columns
         template<IColumn<T> C>
         bool add(C &column);
 
-        [[maybe_unused]]  bool minus(const ColumnType &new_value);
+        [[maybe_unused]] bool minus(const ColumnType &new_value);
         template<IColumn<T> C>
-        [[maybe_unused]]  bool minus(C &join_column);
+        [[maybe_unused]] bool minus(C &join_column);
 
-        [[maybe_unused]]  bool multiply(const ColumnType &new_value);
+        [[maybe_unused]] bool multiply(const ColumnType &new_value);
 
         template<IColumn<T> C>
         [[maybe_unused]] bool multiply(C &join_column);
@@ -157,15 +160,55 @@ namespace CoGaDB {
         bool operator==(const Derived &column) const;
 
         bool operator!=(const Derived &column) const {
-            return !(self()==column);
+            return !(self() == column);
         }
 
         friend std::ostream &operator<<(std::ostream &output, const Derived &base) {
             output << base.print_impl();
             return output;
         }
-    };
 
+        struct Iterator;
+
+
+        Iterator begin() { return Iterator(self(), 0); }
+        Iterator end() { return Iterator(self(), self().size()); }
+
+        struct Iterator {
+            using iterator_category [[maybe_unused]] = std::input_iterator_tag;
+            using difference_type [[maybe_unused]] = std::ptrdiff_t;
+            using value_type = T;
+            using pointer = value_type *;
+            using reference = value_type &;
+
+            Iterator(Derived &container, std::size_t pos) : m_container{container}, m_ptr(pos), m_cur{} {}
+
+            reference operator*() const {  m_cur = m_container[m_ptr]; return m_cur; }
+            pointer operator->() { m_cur = m_container[m_ptr]; return m_cur; }
+
+            Iterator &operator++() {
+                ++m_ptr;
+                return *this;
+            }
+
+            Iterator operator++(int) {
+                Iterator tmp = *this;
+                ++(*this);
+                return tmp;
+            }
+
+            friend bool operator==(const Iterator &a, const Iterator &b) { return a.m_container == b.m_container && a.m_ptr == b.m_ptr; };
+            friend bool operator!=(const Iterator &a, const Iterator &b) {
+                return a.m_container != b.m_container || a.m_ptr != b.m_ptr;
+            };
+
+        private:
+            Derived &m_container;
+            std::size_t m_ptr;
+            mutable value_type m_cur;
+        };
+
+    };
 
 
 }// namespace CoGaDB

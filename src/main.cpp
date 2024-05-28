@@ -6,11 +6,10 @@
 #include <catch2/catch_template_test_macros.hpp>// for TEMPLATE_PRODUCT_TE...
 #include <catch2/catch_test_macros.hpp>         // for operator""_catch_sr
 #include <catch2/generators/catch_generators_random.hpp>
-#include <catch2/matchers/catch_matchers.hpp>// for REQUIRE_THAT
-#include <memory>                            // for unique_ptr
-#include <random>                            // for uniform_int_distrib...
-#include <string>                            // for string
-#include <vector>                            // for vector
+#include <catch2/matchers/catch_matchers_all.hpp>
+#include <random>// for uniform_int_distrib...
+#include <string>// for string
+#include <vector>// for vector
 /*
  * TODO: include your class headers here
  * #include "compression/dictionary_compressed_column.hpp"
@@ -48,6 +47,8 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
 
     /****** INSERT TEST ******/
     std::vector<ValueType> reference_data;
+    REQUIRE(col_one.size() == 0);
+    REQUIRE(col_two.size() == 0);
 
     reference_data = GENERATE_REF(take(1, chunk(TEST_DATA_SIZE, GeneratorWrapper<ValueType>(Catch::Detail::make_unique<RandomColumnDataGenerator<InputType, ValueType>>(low, high)))));
     for (const auto &val: reference_data) {
@@ -55,38 +56,62 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
     }
 
     REQUIRE(reference_data.size() == col_one.size());
-    REQUIRE_THAT(col_one, isEqual<TestType>(reference_data));
+
+    if constexpr (std::is_same_v<ValueType, float>)
+        REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data, [](auto lhs, auto rhs) -> auto { return almostEqualUlps(lhs, rhs, 10); }));
+    else
+        REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data));
 
 
     /****** VIRTUAL COPY CONSTRUCTOR TEST ******/
     auto copy = col_one.copy();
     REQUIRE(copy);
+    REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(*copy));
+
+    /****** ==-Operator TEST ******/
     REQUIRE(col_one == *copy);
 
-    /****** UPDATE TEST ******/
+    /****** UPDATE TESTS ******/
     TID tid = GENERATE(take(1, random(0, TEST_DATA_SIZE)));
     auto new_value = GENERATE_REF(take(1, GeneratorWrapper<ValueType>(Catch::Detail::make_unique<RandomColumnDataGenerator<InputType, ValueType>>(low, high))));
 
     reference_data[tid] = new_value;
 
     REQUIRE_NOTHROW(col_one.update(tid, new_value));
-    REQUIRE_THAT(col_one, isEqual<TestType>(reference_data));
+    if constexpr (std::is_same_v<ValueType, float>) {
+        REQUIRE_THAT(col_one[tid], Catch::Matchers::WithinULP(col_one[tid], 10));
+        REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data, [](auto lhs, auto rhs) -> auto { return almostEqualUlps(lhs, rhs, 10); }));
+    } else {
+        REQUIRE(col_one[tid] == reference_data[tid]);
+        REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data));
+    }
 
-    tid = GENERATE_REF(take(1, random(static_cast<TID>(0), reference_data.size())));
+    tid = GENERATE_REF(take(1, random(TID{}, reference_data.size())));
     new_value = GENERATE_REF(take(1, GeneratorWrapper<ValueType>(Catch::Detail::make_unique<RandomColumnDataGenerator<InputType, ValueType>>(low, high))));
 
     reference_data[tid] = new_value;
 
     REQUIRE_NOTHROW(col_one.update(tid, new_value));
-    REQUIRE_THAT(col_one, isEqual<TestType>(reference_data));
+    if constexpr (std::is_same_v<ValueType, float>) {
+        REQUIRE_THAT(col_one[tid], Catch::Matchers::WithinULP(col_one[tid], 10));
+        REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data, [](auto lhs, auto rhs) -> auto { return almostEqualUlps(lhs, rhs, 10); }));
+    } else {
+        REQUIRE(col_one[tid] == reference_data[tid]);
+        REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data));
+    }
 
     /****** DELETE TEST ******/
     tid = GENERATE(take(1, random(0, TEST_DATA_SIZE)));
 
-    reference_data.erase(reference_data.begin() + tid);
+    reference_data.erase(std::next(reference_data.begin(), tid));
 
     REQUIRE_NOTHROW(col_one.remove(tid));
-    REQUIRE_THAT(col_one, isEqual<TestType>(reference_data));
+    REQUIRE(col_one.size() == reference_data.size());
+
+    if constexpr (std::is_same_v<ValueType, float>)
+        REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data, [](auto lhs, auto rhs) -> auto { return almostEqualUlps(lhs, rhs, 10); }));
+    else
+        REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data));
 
     /****** STORE AND LOAD TEST ******/
     REQUIRE_NOTHROW(col_one.store(DATA_PATH));
@@ -94,5 +119,9 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
     REQUIRE(col_one.size() == 0);
 
     REQUIRE_NOTHROW(col_two.load(DATA_PATH));
-    REQUIRE_THAT(col_two, isEqual<TestType>(reference_data));
+    REQUIRE(col_two.size() == reference_data.size());
+    if constexpr (std::is_same_v<ValueType, float>)
+        REQUIRE_THAT(col_two, Catch::Matchers::RangeEquals(reference_data, [](auto lhs, auto rhs) -> auto { return almostEqualUlps(lhs, rhs, 10); }));
+    else
+        REQUIRE_THAT(col_two, Catch::Matchers::RangeEquals(reference_data));
 }
