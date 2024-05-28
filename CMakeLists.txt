@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0076 NEW)
+cmake_policy(SET CMP0083 NEW)
+include(CheckPIESupported)
 project(db2_programming_project VERSION 2024 LANGUAGES CXX)
 
 #download and include cmake package manager
@@ -64,11 +66,16 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 #configure path for test data
 configure_file(include/config.hpp.in include/config.hpp)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include ${PROJECT_SOURCE_DIR}/include)
 
 #enable support for testing with catch in cmake
 enable_testing()
 include(CTest)
+
+# Clang tidy
+message("Search for clang-tidy")
+find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
+set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "-checks=cppcoreguidelines-,cert-,modernize-,readability-")
 
 #add source
 add_subdirectory(src)

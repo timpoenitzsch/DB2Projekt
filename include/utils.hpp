@@ -12,12 +12,12 @@
 #include <catch2/generators/catch_generators_adapters.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 
+#include "compression/compressed_column.hpp"
+#include "core/column.hpp"
+#include "core/column_base.hpp"
+#include "core/global_definitions.hpp"
 #include <catch2/internal/catch_floating_point_helpers.hpp>
 #include <catch2/internal/catch_polyfills.hpp>
-#include <compression/compressed_column.hpp>
-#include <core/column.hpp>
-#include <core/column_base.hpp>
-#include <core/global_definitions.hpp>
 #include <random>
 #include <string>
 

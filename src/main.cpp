@@ -1,15 +1,21 @@
-
-#include "config.hpp"                           // for DATA_PATH
-#include "core/column.hpp"                      // for Column
-#include "core/global_definitions.hpp"          // for CoGaDB, TID
-#include "tests/utils.hpp"                      // for isEqual, gen, getAt...
-#include <catch2/catch_template_test_macros.hpp>// for TEMPLATE_PRODUCT_TE...
-#include <catch2/catch_test_macros.hpp>         // for operator""_catch_sr
-#include <catch2/generators/catch_generators_random.hpp>
-#include <catch2/matchers/catch_matchers_all.hpp>
-#include <random>// for uniform_int_distrib...
-#include <string>// for string
-#include <vector>// for vector
+#include <config.hpp>                                       // for DATA_PATH
+#include <core/column.hpp>                                  // for Column
+#include <core/global_definitions.hpp>                      // for TID
+#include <utils.hpp>                                        // for almostE...
+#include <catch2/catch_get_random_seed.hpp>                 // for getSeed
+#include <catch2/catch_template_test_macros.hpp>            // for TEMPLAT...
+#include <catch2/catch_test_macros.hpp>                     // for operato...
+#include <catch2/generators/catch_generators.hpp>           // for GENERAT...
+#include <catch2/generators/catch_generators_adapters.hpp>  // for take
+#include <catch2/generators/catch_generators_random.hpp>    // for random
+#include <catch2/matchers/catch_matchers.hpp>               // for REQUIRE...
+#include <catch2/matchers/catch_matchers_floating_point.hpp>// for WithinULP
+#include <catch2/matchers/catch_matchers_range_equals.hpp>  // for RangeEq...
+#include <iterator>                                         // for next
+#include <random>                                           // for mt19937
+#include <string>                                           // for string
+#include <type_traits>                                      // for conditi...
+#include <vector>                                           // for vector
 /*
  * TODO: include your class headers here
  * #include "compression/dictionary_compressed_column.hpp"
