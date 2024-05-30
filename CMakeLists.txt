@@ -75,8 +75,9 @@ include(CTest)
 # Clang tidy
 message("Search for clang-tidy")
 find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
-set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "-checks=cppcoreguidelines-,cert-,modernize-,readability-")
-
+if (CLANG_TIDY_EXE)
+    set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "-checks=cppcoreguidelines-,cert-,modernize-,readability-")
+endif ()
 #add source
 add_subdirectory(src)
 
