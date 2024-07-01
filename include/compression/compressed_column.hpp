@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/column_base.hpp>
-#include <experimental/propagate_const>
 
 namespace CoGaDB
 {

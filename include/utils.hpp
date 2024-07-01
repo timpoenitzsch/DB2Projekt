@@ -74,10 +74,10 @@ int RandomColumnDataGenerator<int,int>::get_rand_value() const {
 template<>
 std::string RandomColumnDataGenerator<int, std::string>::get_rand_value() const {
     std::string s;
-    auto characters = std::uniform_int_distribution('a', 'z');
+    auto characters = std::uniform_int_distribution<int>('a', 'z');
     auto num_char = std::uniform_int_distribution(begin, end);
 
-    std::generate_n(std::back_inserter(s), num_char(gen), [&characters, this]() { return characters(gen); });
+    std::generate_n(std::back_inserter(s), num_char(gen), [&characters, this]()-> char { return characters(gen); });
 
     return s;
 }

@@ -78,7 +78,7 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
     REQUIRE(col_one == *copy);
 
     /****** UPDATE TESTS ******/
-    TID tid = GENERATE(take(1, random(0, TEST_DATA_SIZE)));
+    TID tid = GENERATE(take(1, random(0, TEST_DATA_SIZE-1)));
     auto new_value = GENERATE_REF(take(1, GeneratorWrapper<ValueType>(Catch::Detail::make_unique<RandomColumnDataGenerator<InputType, ValueType>>(low, high))));
 
     reference_data[tid] = new_value;
@@ -92,7 +92,7 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
         REQUIRE_THAT(col_one, Catch::Matchers::RangeEquals(reference_data));
     }
 
-    tid = GENERATE_REF(take(1, random(TID{}, reference_data.size())));
+    tid = GENERATE_REF(take(1, random(TID{}, reference_data.size()-1)));
     new_value = GENERATE_REF(take(1, GeneratorWrapper<ValueType>(Catch::Detail::make_unique<RandomColumnDataGenerator<InputType, ValueType>>(low, high))));
 
     reference_data[tid] = new_value;
@@ -107,7 +107,7 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
     }
 
     /****** DELETE TEST ******/
-    tid = GENERATE(take(1, random(0, TEST_DATA_SIZE)));
+    tid = GENERATE(take(1, random(0, TEST_DATA_SIZE-1)));
 
     reference_data.erase(std::next(reference_data.begin(), tid));
 

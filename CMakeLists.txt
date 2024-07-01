@@ -5,6 +5,10 @@ cmake_policy(SET CMP0083 NEW)
 include(CheckPIESupported)
 project(db2_programming_project VERSION 2024 LANGUAGES CXX)
 
+set(SANITIZE OFF CACHE BOOL "Use Google sanitizers to detect memory leaks, undefined behavior, etc.")
+
+
+
 #download and include cmake package manager
 set(CPM_DOWNLOAD_VERSION 0.38.1)
 
