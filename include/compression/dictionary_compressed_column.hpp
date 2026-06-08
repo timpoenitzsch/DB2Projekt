@@ -3,6 +3,10 @@
  * base class CoGaDB::CompressedColumn and implement the pure virtual methods.
  */
 
+// Dictionary compression stores each distinct value once and keeps only
+// dictionary codes in the logical column representation.
+// Updates and removals do not compact the dictionary to keep codes stable.
+
 #pragma once
 
 #include "compressed_column.hpp"

@@ -16,6 +16,10 @@
 #include <type_traits>
 #include <vector>
 
+// Delta coding stores the first value explicitly and all following numeric
+// values as differences to their predecessor. Strings are handled by a
+// front-coding-like representation using common prefixes.
+
 namespace CoGaDB {
 
     /*!

@@ -14,6 +14,9 @@
 #include <string>
 #include <vector>
 
+// Run length encoding stores consecutive equal values as one value plus
+// its repetition count. This is especially effective for sorted or clustered columns.
+
 namespace CoGaDB {
 
     /*!
