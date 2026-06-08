@@ -129,3 +129,244 @@ TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
     else
         REQUIRE_THAT(col_two, Catch::Matchers::RangeEquals(reference_data));
 }
+
+TEST_CASE("DictionaryCompressedColumn stores repeated values using dictionary semantics", "[dictionary]") {
+    CoGaDB::DictionaryCompressedColumn<std::string> column("dictionary_test");
+
+    column.insert(std::string("Magdeburg"));
+    column.insert(std::string("Berlin"));
+    column.insert(std::string("Magdeburg"));
+    column.insert(std::string("Rostock"));
+    column.insert(std::string("Berlin"));
+
+    REQUIRE(column.size() == 5);
+
+    REQUIRE(std::get<std::string>(column.get(0)) == "Magdeburg");
+    REQUIRE(std::get<std::string>(column.get(1)) == "Berlin");
+    REQUIRE(std::get<std::string>(column.get(2)) == "Magdeburg");
+    REQUIRE(std::get<std::string>(column.get(3)) == "Rostock");
+    REQUIRE(std::get<std::string>(column.get(4)) == "Berlin");
+
+    column.update(2, std::string("Ilmenau"));
+
+    REQUIRE(std::get<std::string>(column.get(0)) == "Magdeburg");
+    REQUIRE(std::get<std::string>(column.get(1)) == "Berlin");
+    REQUIRE(std::get<std::string>(column.get(2)) == "Ilmenau");
+    REQUIRE(std::get<std::string>(column.get(3)) == "Rostock");
+    REQUIRE(std::get<std::string>(column.get(4)) == "Berlin");
+
+    column.remove(1);
+
+    REQUIRE(column.size() == 4);
+    REQUIRE(std::get<std::string>(column.get(0)) == "Magdeburg");
+    REQUIRE(std::get<std::string>(column.get(1)) == "Ilmenau");
+    REQUIRE(std::get<std::string>(column.get(2)) == "Rostock");
+    REQUIRE(std::get<std::string>(column.get(3)) == "Berlin");
+}
+
+
+TEST_CASE("DictionaryCompressedColumn supports store and load", "[dictionary][serialization]") {
+    CoGaDB::DictionaryCompressedColumn<int> source("dictionary_serialization_test");
+    CoGaDB::DictionaryCompressedColumn<int> target("dictionary_serialization_test");
+
+    source.insert(7);
+    source.insert(7);
+    source.insert(42);
+    source.insert(-3);
+    source.insert(42);
+
+    REQUIRE_NOTHROW(source.store(DATA_PATH));
+
+    target.load(DATA_PATH);
+
+    REQUIRE(target.size() == source.size());
+
+    for (CoGaDB::TID tid = 0; tid < source.size(); ++tid) {
+        REQUIRE(std::get<int>(target.get(tid)) == std::get<int>(source.get(tid)));
+    }
+}
+
+
+TEST_CASE("RunLengthCompressedColumn preserves long runs", "[rle]") {
+    CoGaDB::RunLengthCompressedColumn<int> column("rle_test");
+
+    column.insert(1);
+    column.insert(1);
+    column.insert(1);
+    column.insert(2);
+    column.insert(2);
+    column.insert(3);
+    column.insert(3);
+    column.insert(3);
+    column.insert(3);
+
+    REQUIRE(column.size() == 9);
+
+    std::vector<int> expected{1, 1, 1, 2, 2, 3, 3, 3, 3};
+
+    for (CoGaDB::TID tid = 0; tid < expected.size(); ++tid) {
+        REQUIRE(std::get<int>(column.get(tid)) == expected[tid]);
+    }
+}
+
+
+TEST_CASE("RunLengthCompressedColumn rebuilds runs correctly after update and remove", "[rle]") {
+    CoGaDB::RunLengthCompressedColumn<std::string> column("rle_update_remove_test");
+
+    column.insert(std::string("A"));
+    column.insert(std::string("A"));
+    column.insert(std::string("B"));
+    column.insert(std::string("B"));
+    column.insert(std::string("C"));
+
+    column.update(2, std::string("A"));
+
+    std::vector<std::string> after_update{"A", "A", "A", "B", "C"};
+
+    REQUIRE(column.size() == after_update.size());
+
+    for (CoGaDB::TID tid = 0; tid < after_update.size(); ++tid) {
+        REQUIRE(std::get<std::string>(column.get(tid)) == after_update[tid]);
+    }
+
+    column.remove(3);
+
+    std::vector<std::string> after_remove{"A", "A", "A", "C"};
+
+    REQUIRE(column.size() == after_remove.size());
+
+    for (CoGaDB::TID tid = 0; tid < after_remove.size(); ++tid) {
+        REQUIRE(std::get<std::string>(column.get(tid)) == after_remove[tid]);
+    }
+}
+
+
+TEST_CASE("RunLengthCompressedColumn supports store and load", "[rle][serialization]") {
+    CoGaDB::RunLengthCompressedColumn<int> source("rle_serialization_test");
+    CoGaDB::RunLengthCompressedColumn<int> target("rle_serialization_test");
+
+    std::vector<int> values{5, 5, 5, 10, 10, -1, -1, -1, -1};
+
+    for (const auto value: values) {
+        source.insert(value);
+    }
+
+    REQUIRE_NOTHROW(source.store(DATA_PATH));
+
+    target.load(DATA_PATH);
+
+    REQUIRE(target.size() == values.size());
+
+    for (CoGaDB::TID tid = 0; tid < values.size(); ++tid) {
+        REQUIRE(std::get<int>(target.get(tid)) == values[tid]);
+    }
+}
+
+
+TEST_CASE("DeltaCompressedColumn stores arithmetic deltas correctly", "[delta]") {
+    CoGaDB::DeltaCompressedColumn<int> column("delta_int_test");
+
+    std::vector<int> values{100, 103, 106, 105, 120, 90};
+
+    for (const auto value: values) {
+        column.insert(value);
+    }
+
+    REQUIRE(column.size() == values.size());
+
+    for (CoGaDB::TID tid = 0; tid < values.size(); ++tid) {
+        REQUIRE(std::get<int>(column.get(tid)) == values[tid]);
+    }
+}
+
+
+TEST_CASE("DeltaCompressedColumn supports float values", "[delta]") {
+    CoGaDB::DeltaCompressedColumn<float> column("delta_float_test");
+
+    std::vector<float> values{1.5F, 2.0F, 2.25F, -1.0F, 10.75F};
+
+    for (const auto value: values) {
+        column.insert(value);
+    }
+
+    REQUIRE(column.size() == values.size());
+
+    for (CoGaDB::TID tid = 0; tid < values.size(); ++tid) {
+        REQUIRE_THAT(std::get<float>(column.get(tid)), Catch::Matchers::WithinULP(values[tid], 10));
+    }
+}
+
+
+TEST_CASE("DeltaCompressedColumn handles string front-coding-style values", "[delta][string]") {
+    CoGaDB::DeltaCompressedColumn<std::string> column("delta_string_test");
+
+    std::vector<std::string> values{
+        "Ein String",
+        "Ein String2",
+        "Eine Zeichenkette",
+        "Eine Zweite Zeichenkette",
+        "Noch ein String"
+    };
+
+    for (const auto &value: values) {
+        column.insert(value);
+    }
+
+    REQUIRE(column.size() == values.size());
+
+    for (CoGaDB::TID tid = 0; tid < values.size(); ++tid) {
+        REQUIRE(std::get<std::string>(column.get(tid)) == values[tid]);
+    }
+}
+
+
+TEST_CASE("DeltaCompressedColumn rebuilds representation after update and remove", "[delta]") {
+    CoGaDB::DeltaCompressedColumn<int> column("delta_update_remove_test");
+
+    column.insert(10);
+    column.insert(13);
+    column.insert(16);
+    column.insert(20);
+
+    column.update(1, 12);
+
+    std::vector<int> after_update{10, 12, 16, 20};
+
+    REQUIRE(column.size() == after_update.size());
+
+    for (CoGaDB::TID tid = 0; tid < after_update.size(); ++tid) {
+        REQUIRE(std::get<int>(column.get(tid)) == after_update[tid]);
+    }
+
+    column.remove(2);
+
+    std::vector<int> after_remove{10, 12, 20};
+
+    REQUIRE(column.size() == after_remove.size());
+
+    for (CoGaDB::TID tid = 0; tid < after_remove.size(); ++tid) {
+        REQUIRE(std::get<int>(column.get(tid)) == after_remove[tid]);
+    }
+}
+
+
+TEST_CASE("DeltaCompressedColumn supports store and load", "[delta][serialization]") {
+    CoGaDB::DeltaCompressedColumn<int> source("delta_serialization_test");
+    CoGaDB::DeltaCompressedColumn<int> target("delta_serialization_test");
+
+    std::vector<int> values{1000, 1001, 1005, 990, 1200};
+
+    for (const auto value: values) {
+        source.insert(value);
+    }
+
+    REQUIRE_NOTHROW(source.store(DATA_PATH));
+
+    target.load(DATA_PATH);
+
+    REQUIRE(target.size() == values.size());
+
+    for (CoGaDB::TID tid = 0; tid < values.size(); ++tid) {
+        REQUIRE(std::get<int>(target.get(tid)) == values[tid]);
+    }
+}
