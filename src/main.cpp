@@ -17,6 +17,7 @@
 #include <type_traits>                                      // for conditi...
 #include <vector>                                           // for vector
 #include <compression/dictionary_compressed_column.hpp>
+#include <compression/run_length_compressed_column.hpp>
 
 constexpr int TEST_DATA_SIZE = 100;
 
@@ -36,7 +37,7 @@ using namespace CoGaDB;
 TEMPLATE_PRODUCT_TEST_CASE_METHOD(Column_Test_Fixture,
                                   "Template test case method with test types specified inside std::tuple",
                                   "[class][template]",
-                                  (Column, DictionaryCompressedColumn),
+                                  (Column, DictionaryCompressedColumn, RunLengthCompressedColumn),
                                   (int, float, std::string)) {
     using ValueType = typename Column_Test_Fixture<TestType>::ValueType;
     using InputType = typename std::conditional_t<std::is_same_v<ValueType, std::string>, int, ValueType>;
